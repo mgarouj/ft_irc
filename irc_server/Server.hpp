@@ -21,12 +21,11 @@ public:
     Server(int _port, std::string _password);
     Server(const Server& ob);
     ~Server();
-    // Server& operator=(const Server& ob);
+    Server& operator=(const Server& ob);
 
     void init();
 
     // void acceptNewClient();
     // void handleClientData();
-
-    // void run(int c, char **v);
+    void run(int c, char **v);
 };
