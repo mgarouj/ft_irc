@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <unistd.h>
 #include <string>
 #include <vector>
 #include <netinet/in.h>

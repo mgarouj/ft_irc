@@ -64,10 +64,49 @@ void Server::init(){
 
 void Server::run(int c, char **v){
 	while (true){
-		int ret = poll(this->_fds.data(), this->_fds.size(), -1);
-		if (ret < 0){
-			throw std::runtime_error("poll error");
-			break;
+		if (poll(_fds.data(), _fds.size(), -1) < 0)
+			throw std::runtime_error("Error: poll failed");
+	}
+
+	for (size_t i = 0; i < _fds.size(); i++){
+		if (_fds[i].revents & POLLIN){
+			if (_fds[i].fd == _Server_socket_fd){
+				struct sockaddr_in client_addr;
+				socklen_t client_len = sizeof(client_addr);
+				int client_fd = accept(_Server_socket_fd, (struct sockaddr*)&client_addr, &client_len);
+				if (client_fd < 0){
+					perror("accept failed");
+					continue;
+				}
+
+				fcntl(client_fd, F_SETFL, O_NONBLOCK);
+
+				struct pollfd client_pfd;
+				client_pfd.fd = client_fd;
+				client_pfd.events = POLLIN;
+				client_pfd.revents = 0;
+				_fds.push_back(client_pfd);
+
+				std::cout << "New client connected! FD: " << client_fd << std::enl;
+			}
+
+			else{
+				char buffer[1024];
+
+				std::memset(buffer, 0, sizeof(buffer));
+				int bytes = recv(_fds[i].fd, buffer, sizeof(buffer) - 1, 0);
+
+				if (bytes <= 0){
+					std::cout << "Client Disconnected. FD: " << _fds[i].fd << std::endl;
+					close(_fds[i].fd);
+					_fds.erase(_fds.begin() + i);
+					i--;
+				}
+
+				else{
+					std::cout << "Message from " << _fds[i].fd << ": " << buffer << std::endl;
+				}
+			}
 		}
 	}
 }
