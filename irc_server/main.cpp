@@ -37,6 +37,7 @@ int main(int c, char **v)
     try{
         Server srv(std::atoi(v[1]), v[2]);
         srv.init();
+        srv.run();
     }
     catch (const std::exception& ob)
     {

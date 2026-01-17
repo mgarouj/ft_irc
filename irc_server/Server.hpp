@@ -17,6 +17,10 @@ private:
     std::string _password;
     int _Server_socket_fd;
     std::vector<struct pollfd> _fds;
+    
+    // we use this two function to accept and handle data from client
+    void acceptNewClient();
+    void handleClientData(size_t& i);
 
 public:
     Server(int _port, std::string _password);
@@ -25,8 +29,5 @@ public:
     Server& operator=(const Server& ob);
 
     void init();
-
-    // void acceptNewClient();
-    // void handleClientData();
-    void run(int c, char **v);
+    void run();
 };
