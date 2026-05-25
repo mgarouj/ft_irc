@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int _port, std::string _password):_port(_port), _password(_password){
+Server::Server(int _port, std::string _password):_port(_port), _password(_password){ // initiale port and pasword
 
 }
 
@@ -24,18 +24,18 @@ Server& Server::operator=(const Server& ob){
 }
 
 void Server::init(){
-	_Server_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+	_Server_socket_fd = socket(AF_INET, SOCK_STREAM, 0); // try to open socket 
 	if (_Server_socket_fd == -1)
-		throw std::runtime_error("Error: Failed to creat socket.");
+		throw std::runtime_error("Error: Failed to creat socket."); // if socket not open should throw exeption 
 	
 	int en = 1;
-	if (setsockopt(_Server_socket_fd, SOL_SOCKET, SO_REUSEADDR, &en, sizeof(en)) == -1)
-		throw std::runtime_error("Error: Failed to set socket options.");
+	if (setsockopt(_Server_socket_fd, SOL_SOCKET, SO_REUSEADDR, &en, sizeof(en)) == -1) // set option to en for server socket
+		throw std::runtime_error("Error: Failed to set socket options."); // thorw exeption if any error exist
 
 	if (fcntl(_Server_socket_fd, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Error: Failed to set non-blocking mode.");
 	
-	struct sockaddr_in sa;
+	struct sockaddr_in sa; 
 	sa.sin_family = AF_INET;
 	sa.sin_addr.s_addr = INADDR_ANY;
 	sa.sin_port = htons(_port);
@@ -43,15 +43,15 @@ void Server::init(){
 	if (bind(_Server_socket_fd, (struct  sockaddr *)&sa, sizeof(sa)) < 0)
 		throw std::runtime_error("Error: Failed to bind socket.");
 
-	if (listen(_Server_socket_fd, SOMAXCONN) < 0)
+	if (listen(_Server_socket_fd, SOMAXCONN) < 0) // make my server to listen to this socket 
 		throw std::runtime_error("Error: Failed to listen.");
 
-	struct pollfd pfd;
+	struct pollfd pfd; 
 	pfd.fd = _Server_socket_fd;
 	pfd.events = POLLIN;
 	pfd.revents = 0;
 
-	_fds.push_back(pfd);
+	_fds.push_back(pfd); // push new client to the stack 
 
 	std::cout << "server initialized successfully on port " << _port << std::endl;    
 }
@@ -99,10 +99,10 @@ void Server::handleClientData(size_t& i){
 void Server::run(){
 	while (true){
 		if (poll(_fds.data(), _fds.size(), -1) < 0)
-			throw std::runtime_error("Error: poll failed");
+			throw std::runtime_error("Error: poll failed"); // if any error exist 
 	
 
-		for (size_t i = 0; i < _fds.size(); i++){
+		for (size_t i = 0; i < _fds.size(); i++){ // loop for all file descreptor and accept the client 
 			if (_fds[i].revents & POLLIN){
 				if (_fds[i].fd == _Server_socket_fd){
 					acceptNewClient();

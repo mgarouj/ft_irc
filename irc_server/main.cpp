@@ -2,20 +2,20 @@
 
 void isValidePsPo(char **v)
 {
-    std::string _port(v[1]);
-    std::string _password(v[2]);
+    std::string _port(v[1]); // add port v[1] from argv
+    std::string _password(v[2]); // add password v[2] from argv
 
     for (size_t i = 0; i < _port.length(); i++)
     {
-        if (!std::isdigit(_port[i]))
-            throw std::runtime_error("Error: Invalide port!");
+        if (!std::isdigit(_port[i])) // check if port contain anything else 
+            throw std::runtime_error("Error: Invalide port!"); // throw exeption if any error exist
     }
 
-    int portInt = std::atoi(_port.c_str());
-    if (portInt < 1024 || portInt > 65535)
-        throw std::runtime_error("Error: (Use range 1024-65535)");
+    int portInt = std::atoi(_port.c_str()); // convert port to int 
+    if (portInt < 1024 || portInt > 65535) 
+        throw std::runtime_error("Error: (Use range 1024-65535)"); // if port portInt < 1024 || portInt > 65535 -> this range 
     
-    if (_password.empty())
+    if (_password.empty()) // if password not exit should throw exeption 
         throw std::runtime_error("Error: password cannot be empty");
 }
 
