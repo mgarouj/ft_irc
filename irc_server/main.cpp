@@ -34,7 +34,6 @@ int main(int c, char **v)
         return 2;
     }
 
-
     try{
         Server srv(std::atoi(v[1]), v[2]);
         srv.init();
