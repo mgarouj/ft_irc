@@ -65,7 +65,7 @@ void Server::acceptNewClient(){
 		return;
 	}
 
-	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0){
+	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0){ // if fclntl fail we should throw exeption and print messaje in sdt erorr
 		perror("fcntl failed");
 		close(client_fd);
 		return;

@@ -21,7 +21,7 @@ void isValidePsPo(char **v)
 
 int main(int c, char **v)
 {
-    if (c != 3)
+    if (c != 3) // if c != 3 we should print error in std::err
     {
         std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
         return 1;
@@ -33,6 +33,7 @@ int main(int c, char **v)
         std::cout << ob.what() << std::endl;
         return 2;
     }
+
 
     try{
         Server srv(std::atoi(v[1]), v[2]);
