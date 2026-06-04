@@ -1,7 +1,8 @@
+#include <cstring>
 #include <iostream>
-#include <string>
-
-
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 int main(void)
 {
@@ -27,8 +28,8 @@ int main(void)
     // recieving data
     char buffer[1024] = { 0 };
     recv(clientSocket, buffer, sizeof(buffer), 0);
-    cout << "Message from client: " << buffer
-              << endl;
+    std::cout << "Message from client: " << buffer
+              << std::endl;
 
     // closing the socket.
     close(serverSocket);
