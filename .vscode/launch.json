@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/mnt/homes/mgarouj/Desktop/my_project/c5/ft_irc",
+      "program": "/mnt/homes/mgarouj/Desktop/my_project/c5/ft_irc/build/Debug/outDebug"
+    }
+  ]
+}

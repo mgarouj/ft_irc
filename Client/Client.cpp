@@ -1,4 +1,4 @@
-#include "Client.hpp"
+#include "../Headers/Client.hpp"
 
 Client::Client() : fd(-1), nickname(""), username(""), realname(""), password(""), authenticated(false) {}
 

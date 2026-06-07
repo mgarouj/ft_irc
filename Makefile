@@ -1,24 +1,27 @@
-CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+NAME        = ft_irc
 
-SRCDIR = .
-OBJDIR = obj
-BINDIR = .
+CXX         = c++
+CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 
-SOURCES = $(SRCDIR)/main.cpp $(SRCDIR)/Server/Server.cpp $(SRCDIR)/Client/Client.cpp
-OBJECTS = $(OBJDIR)/main.o $(OBJDIR)/Server/Server.o $(OBJDIR)/Client/Client.o
-TARGET = irc_server
+# Add your source files here
+SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp
 
-.PHONY: all clean
+OBJS        = $(SRCS:.cpp=.o)
 
-all: $(TARGET)
+all: $(NAME)
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$@ $^
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -I$(SRCDIR)/Headers -c $< -o $@
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJDIR)
+	rm -f $(OBJS)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all
+
+.PHONY: all clean fclean re

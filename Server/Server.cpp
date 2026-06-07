@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../Headers/Server.hpp"
 
 
 Server::Server() : password(""), port(0), serverSocket(-1) {}

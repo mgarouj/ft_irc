@@ -20,7 +20,6 @@ class Server
         int port;
         int serverSocket;
         struct sockaddr_in address;
-        // struct pollfd pfd;
         std::vector<struct pollfd> pollfds;
         std::map<int, Client> clients;
 
