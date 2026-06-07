@@ -38,7 +38,11 @@ void Server::start()
         throw std::runtime_error("Error: listen() failed to open the socket.");
     if (fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
         throw std::runtime_error("Error: fcntl() failed to set the socket to non-blocking mode.");  
-    pollfds.push_back({serverSocket, POLLIN, 0});
+    struct pollfd serverPfd;
+    serverPfd.fd = serverSocket;
+    serverPfd.events = POLLIN;
+    serverPfd.revents = 0;
+    pollfds.push_back(serverPfd);
     run();
 }
 
@@ -46,6 +50,7 @@ void Server::run()
 {
     while (true)
     {
+        std::cout << "here" << "Waiting for events..." << std::endl;
         if (poll(pollfds.data(), pollfds.size(), -1) < 0)
             throw std::runtime_error("Error: poll() failed to monitor the file descriptors.");
         for (size_t i = 0; i < pollfds.size(); ++i)
@@ -57,11 +62,62 @@ void Server::run()
                 else
                     handleClient(pollfds[i].fd);
             }
+            else if (pollfds[i].revents & (POLLHUP | POLLERR))
+            {
+                std::cout << "Client disconnected: " << pollfds[i].fd << std::endl;
+                close(pollfds[i].fd);
+                pollfds.erase(pollfds.begin() + i);
+                clients.erase(pollfds[i].fd);
+                --i; // Adjust index after erasing
+            }
         }
     }
 }
 
 void Server::acceptConnection()
 {
-    
+    struct sockaddr_in clientAddress;
+    socklen_t clientAddressLen = sizeof(clientAddress);
+    int clientFd = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressLen);
+    if (clientFd < 0)
+    {
+        std::cerr << "Error: accept() failed to accept a new connection." << std::endl;
+        return;
+    }
+    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    struct pollfd clientPfd;
+    clientPfd.fd = clientFd;
+    clientPfd.events = POLLIN;
+    clientPfd.revents = 0;
+    pollfds.push_back(clientPfd);
+    clients[clientFd] = Client(clientFd);
+    std::cout << "New client connected: " << clientFd << std::endl;
+}
+
+void Server::handleClient(int clientFd)
+{
+    char buffer[1024];
+    ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+    if (bytesRead == -1)
+    {
+        std::cerr << "Error: recv() failed to receive data from client " << clientFd << std::endl;
+        return;
+    }
+    else if (bytesRead == 0)
+    {
+        std::cout << "Client disconnected: " << clientFd << std::endl;
+        close(clientFd);
+        for (std::vector<struct pollfd>::iterator it = pollfds.begin(); it != pollfds.end(); ++it)
+        {
+            if (it->fd == clientFd)
+            {
+                pollfds.erase(it);
+                break;
+            }
+        }
+        clients.erase(clientFd);
+        return;
+    }
+    buffer[bytesRead] = '\0';
+    std::cout << "Received from client " << clientFd << ": " << buffer << std::endl;
 }
