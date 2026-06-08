@@ -35,6 +35,5 @@ class Server
         void run();
         void acceptConnection();
         void handleClient(int clientFd);
-
-
-};
+        void authenticateClient(Client &client, const std::string &password);
+    };

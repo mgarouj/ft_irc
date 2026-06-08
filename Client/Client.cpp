@@ -42,8 +42,13 @@ void Client::setPassword(const std::string &password) { this->password = passwor
 
 void Client::authenticate(const std::string &serverPassword)
 {
-    if (password == serverPassword)
+    if (serverPassword == password)
+        passAuthentication = true;
+    if (passAuthentication && nickAuthentication && userAuthentication)
         authenticated = true;
-    else
-        authenticated = false;
+}
+
+void Client::setclientBuffer(const std::string &buffer)
+{
+    clientBuffer += buffer; 
 }

@@ -19,7 +19,15 @@ class Client
         std::string username;
         std::string realname;
         std::string password;
+
         bool authenticated;
+        bool passAuthentication;
+        bool nickAuthentication;
+        bool userAuthentication;
+
+        std::string clientBuffer;
+
+        std::pair<std::string, std::string> pairCmd;
 
     public:
         Client();
@@ -38,7 +46,11 @@ class Client
         void setUsername(const std::string &username);
         void setRealname(const std::string &realname);
         void setPassword(const std::string &password);
+        void setclientBuffer(const std::string &buffer);
         void authenticate(const std::string &serverPassword);
+        
+
+
 };
 
 #endif

@@ -94,6 +94,14 @@ void Server::acceptConnection()
     std::cout << "New client connected: " << clientFd << std::endl;
 }
 
+// Server::authenticateClient(Client &client, const std::string &password)
+// {
+//     if (password == this->password)
+//     {
+//         client.authenticate(this->password);
+//     }
+// }
+
 void Server::handleClient(int clientFd)
 {
     char buffer[1024];
@@ -118,6 +126,13 @@ void Server::handleClient(int clientFd)
         clients.erase(clientFd);
         return;
     }
-    buffer[bytesRead] = '\0';
+    else
+    {
+        buffer[bytesRead] = '\0';
+        std::string bufferString(buffer, bytesRead);
+        clients[clientFd].setclientBuffer(bufferString);
+        
+        
+    }
     std::cout << "Received from client " << clientFd << ": " << buffer << std::endl;
-}
+} /// cmd\n cmd2\n cmd3\r\n
