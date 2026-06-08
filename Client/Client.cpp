@@ -52,3 +52,8 @@ void Client::setclientBuffer(const std::string &buffer)
 {
     clientBuffer += buffer; 
 }
+
+std::string &Client::getclientBuffer()
+{
+    return clientBuffer;
+}

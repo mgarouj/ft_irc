@@ -40,6 +40,7 @@ class Client
         const std::string &getNickname() const;
         const std::string &getUsername() const;
         const std::string &getRealname() const;
+        std::string &getclientBuffer();
         bool isAuthenticated() const;
 
         void setNickname(const std::string &nickname);

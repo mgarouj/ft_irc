@@ -28,6 +28,11 @@ void Server::start()
     {
         throw std::runtime_error("Failed to create socket");
     }
+    int opt = 1;
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+    {
+        throw std::runtime_error("Error: setsockopt() failed");
+    }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(port);
@@ -94,13 +99,13 @@ void Server::acceptConnection()
     std::cout << "New client connected: " << clientFd << std::endl;
 }
 
-// Server::authenticateClient(Client &client, const std::string &password)
-// {
-//     if (password == this->password)
-//     {
-//         client.authenticate(this->password);
-//     }
-// }
+void Server::authenticateClient(Client &client, const std::string &password)
+{
+    if (password == this->password)
+    {
+        client.authenticate(this->password);
+    }
+}
 
 void Server::handleClient(int clientFd)
 {
@@ -131,8 +136,55 @@ void Server::handleClient(int clientFd)
         buffer[bytesRead] = '\0';
         std::string bufferString(buffer, bytesRead);
         clients[clientFd].setclientBuffer(bufferString);
+        std::string &currentBuffer = clients[clientFd].getclientBuffer();
+        while (true)
+        {
+            std::cout << "____________Current buffer for client " << clientFd << ": " << currentBuffer << std::endl;
+            std::pair<std::string, std::string> command = extractAndSplit(currentBuffer);
+            std::cout << "before break point-------------------" << std::endl;
+
+            if (command.first.empty()) //JOI 
+                break;
+            std::cout << "break point-------------------" << std::endl;
+            std::cout << "++++++++++++++++++++++++++++++Command: " << command.first << ", Args: " << command.second << std::endl;
+            
+            // executeCommand(command, clients[clientFd]);
+
+        }
+
         
         
     }
     std::cout << "Received from client " << clientFd << ": " << buffer << std::endl;
-} /// cmd\n cmd2\n cmd3\r\n
+}
+
+std::pair<std::string, std::string> Server::extractAndSplit(std::string &buffer)
+{
+    std::pair<std::string, std::string> result = std::make_pair("", "");
+    size_t pos = buffer.find('\n');
+    if (pos == std::string::npos)
+        return result;
+
+    std::string line = buffer.substr(0, pos + 1); ///ssss\n fsdfds\n sdfsdfds sfd \r\n fsdfds\n sdfsdfds sfd \r\n
+
+    buffer.erase(0, pos + 1);
+
+    size_t endOfText = line.find_last_not_of("\r\n");
+    if (endOfText != std::string::npos)
+        line = line.substr(0, endOfText + 1);
+    else
+        line = "";
+    
+    size_t spacePos = line.find(' ');
+    if (spacePos != std::string::npos)
+    {
+        result.first = line.substr(0, spacePos);
+        result.second = line.substr(spacePos + 1);
+    }
+    else
+    {
+        result.first = line;
+        result.second = "";
+    }
+    return result;
+}

@@ -24,6 +24,8 @@ class Server
         std::map<int, Client> clients;
 
 
+
+
     public:
         Server();
         Server(const std::string &password, const int port);
@@ -36,4 +38,6 @@ class Server
         void acceptConnection();
         void handleClient(int clientFd);
         void authenticateClient(Client &client, const std::string &password);
+        std::pair<std::string, std::string> extractAndSplit(std::string &buffer);
+        // void executeCommand(const std::pair<std::string, std::string> &cmdPair, Client &client);
     };
