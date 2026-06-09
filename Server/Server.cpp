@@ -134,55 +134,48 @@ void Server::handleClient(int clientFd)
     else
     {
         buffer[bytesRead] = '\0';
+
         std::string bufferString(buffer, bytesRead);
+        for (std::string::size_type pos = 0; (pos = bufferString.find("\r\n", pos)) != std::string::npos;)
+            bufferString.replace(pos, 2, "\n");
+
         clients[clientFd].setclientBuffer(bufferString);
         std::string &currentBuffer = clients[clientFd].getclientBuffer();
-        while (true)
+        size_t pos;
+        if (( (pos=currentBuffer.find('\n') )!= std::string::npos))
         {
-            std::pair<std::string, std::string> command = extractAndSplit(currentBuffer);
+            std::vector<std::string> cmds=  extractAndSplit(currentBuffer);
+                std::cout <<"pos : "<<  pos << std::endl;
 
-            if (command.first.empty()) //JOI 
-                break;
-            std::cout << "buffer client: " << clients[clientFd].getclientBuffer() << std::endl;
-            std::cout << "first: " << command.first << "    second: " << command.second << std::endl;
-            
-            // executeCommand(command, clients[clientFd]);
-
+            for (size_t i = 0; i < cmds.size(); i++)
+                std::cout <<"cmd : "<<  cmds[i] << std::endl;
+            std::cout << "------------------------------------------------------" << std::endl;
+            // if (cmds.size == 0)
+            //     // return
+            // if (cmds[0] == "nick")
+            // if (cmds[0] == "nick")
+            // if (cmds[0] == "nick")
+            // if (cmds[0] == "nick")
+            // if (cmds[0] == "nick")
+            // if (cmds[0] == "nick")
+            // if (cmds[0] == "nick")
         }
-
-        
+        std::cout << "++++++++++++++++++++++++++++" << std::endl;
         
     }
     // std::cout << "Received from client " << clientFd << ": " << buffer << std::endl;
 }
 
-std::pair<std::string, std::string> Server::extractAndSplit(std::string &buffer)
+std::vector<std::string> Server::extractAndSplit(std::string &buffer)
 {
-    std::pair<std::string, std::string> result = std::make_pair("", "");
-    size_t pos = buffer.find('\n');
-    if (pos == std::string::npos)
-        return result;
+    std::string save;
+    std::stringstream ss(buffer);
+    std::vector<std::string> resulte;
 
-    std::string line = buffer.substr(0, pos + 1); ///ssss\n fsdfds\n sdfsdfds sfd \r\n fsdfds\n sdfsdfds sfd \r\n
-
-    buffer.erase(0, pos + 1);
-
-    size_t endOfText = line.find_last_not_of("\r\n");
-    if (endOfText != std::string::npos)
-        line = line.substr(0, endOfText + 1);
-    else
-        line = "";
-    
-    size_t spacePos = line.find(' ');
-    if (spacePos != std::string::npos)
+    while (getline(ss, save, ' '))
     {
-        result.first = line.substr(0, spacePos);
-        result.second = line.substr(spacePos + 1);
+        if (!save.empty())
+            resulte.push_back(save);
     }
-    else
-    {
-        result.first = line;
-        result.second = "";
-    }
-    return result;
+    return resulte;
 }

@@ -2,6 +2,7 @@
 
 
 #include <iostream>
+#include <iostream>
 #include <string>
 #include <stdexcept>
 #include <sys/socket.h>
@@ -9,6 +10,7 @@
 #include <unistd.h>
 #include <poll.h>
 #include <vector>
+#include <sstream>
 #include <fcntl.h>
 #include <map>
 #include "Client.hpp"
@@ -38,6 +40,6 @@ class Server
         void acceptConnection();
         void handleClient(int clientFd);
         void authenticateClient(Client &client, const std::string &password);
-        std::pair<std::string, std::string> extractAndSplit(std::string &buffer);
+       std::vector<std::string> extractAndSplit(std::string &buffer);
         // void executeCommand(const std::pair<std::string, std::string> &cmdPair, Client &client);
     };

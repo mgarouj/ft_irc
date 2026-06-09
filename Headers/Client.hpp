@@ -27,7 +27,7 @@ class Client
 
         std::string clientBuffer;
 
-        std::pair<std::string, std::string> pairCmd;
+        std::vector<std::string> pairCmd;
 
     public:
         Client();
