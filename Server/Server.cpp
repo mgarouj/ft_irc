@@ -55,7 +55,7 @@ void Server::run()
 {
     while (true)
     {
-        std::cout << "here" << "Waiting for events..." << std::endl;
+        // std::cout << "here" << "Waiting for events..." << std::endl;
         if (poll(pollfds.data(), pollfds.size(), -1) < 0)
             throw std::runtime_error("Error: poll() failed to monitor the file descriptors.");
         for (size_t i = 0; i < pollfds.size(); ++i)
@@ -139,14 +139,12 @@ void Server::handleClient(int clientFd)
         std::string &currentBuffer = clients[clientFd].getclientBuffer();
         while (true)
         {
-            std::cout << "____________Current buffer for client " << clientFd << ": " << currentBuffer << std::endl;
             std::pair<std::string, std::string> command = extractAndSplit(currentBuffer);
-            std::cout << "before break point-------------------" << std::endl;
 
             if (command.first.empty()) //JOI 
                 break;
-            std::cout << "break point-------------------" << std::endl;
-            std::cout << "++++++++++++++++++++++++++++++Command: " << command.first << ", Args: " << command.second << std::endl;
+            std::cout << "buffer client: " << clients[clientFd].getclientBuffer() << std::endl;
+            std::cout << "first: " << command.first << "    second: " << command.second << std::endl;
             
             // executeCommand(command, clients[clientFd]);
 
@@ -155,7 +153,7 @@ void Server::handleClient(int clientFd)
         
         
     }
-    std::cout << "Received from client " << clientFd << ": " << buffer << std::endl;
+    // std::cout << "Received from client " << clientFd << ": " << buffer << std::endl;
 }
 
 std::pair<std::string, std::string> Server::extractAndSplit(std::string &buffer)
