@@ -42,6 +42,10 @@ class Client
         const std::string &getRealname() const;
         std::string &getclientBuffer();
         bool isAuthenticated() const;
+        
+        bool getPassAuthentication() const;
+        bool getNickAuthentication() const;
+        bool getUserAuthentication() const;
 
         void setNickname(const std::string &nickname);
         void setUsername(const std::string &username);
@@ -50,7 +54,9 @@ class Client
         void setclientBuffer(const std::string &buffer);
         void authenticate(const std::string &serverPassword);
         
-
+        void setPassAuthentication(bool status);
+        void setNickAuthentication(bool status);
+        void setUserAuthentication(bool status);
 
 };
 

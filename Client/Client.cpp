@@ -57,3 +57,33 @@ std::string &Client::getclientBuffer()
 {
     return clientBuffer;
 }
+
+void Client::setPassAuthentication(bool status)
+{
+    passAuthentication = status;
+}
+
+void Client::setNickAuthentication(bool status)
+{
+    nickAuthentication = status;
+}
+
+void Client::setUserAuthentication(bool status)
+{
+    userAuthentication = status;
+}
+
+bool Client::getPassAuthentication() const
+{
+    return passAuthentication;
+}
+
+bool Client::getNickAuthentication() const
+{
+    return nickAuthentication;
+}
+
+bool Client::getUserAuthentication() const
+{
+    return userAuthentication;
+}
