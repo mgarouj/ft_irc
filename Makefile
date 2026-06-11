@@ -4,7 +4,7 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 
 # Add your source files here
-SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp
+SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp ./Commands/Nick.cpp ./Commands/User.cpp
 
 OBJS        = $(SRCS:.cpp=.o)
 
@@ -24,4 +24,7 @@ fclean: clean
 
 re: fclean all
 
+run: re clean
+	clear
+	./ft_irc 7777 aaaa
 .PHONY: all clean fclean re

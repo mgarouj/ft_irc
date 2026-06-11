@@ -1,11 +1,27 @@
 #include "../Headers/Client.hpp"
 
-Client::Client() : fd(-1), nickname(""), username(""), realname(""), password(""), authenticated(false) {}
+#include "../Headers/Client.hpp"
 
-Client::Client(int fd) : fd(fd), nickname(""), username(""), realname(""), password(""), authenticated(false) {}
+// Default Constructor
+Client::Client() : fd(-1), nickname(""), username(""), realname(""), password(""), 
+                   authenticated(false), passAuthentication(false), 
+                   nickAuthentication(false), userAuthentication(false) {}
 
-Client::Client(const Client &other) : fd(other.fd), nickname(other.nickname), username(other.username), realname(other.realname), password(other.password), authenticated(other.authenticated) {}
+// Parameterized Constructor
+Client::Client(int fd) : fd(fd), nickname(""), username(""), realname(""), password(""), 
+                         authenticated(false), passAuthentication(false), 
+                         nickAuthentication(false), userAuthentication(false) {}
 
+// Copy Constructor
+Client::Client(const Client &other) : fd(other.fd), nickname(other.nickname), 
+                                      username(other.username), realname(other.realname), 
+                                      password(other.password), authenticated(other.authenticated),
+                                      passAuthentication(other.passAuthentication), 
+                                      nickAuthentication(other.nickAuthentication), 
+                                      userAuthentication(other.userAuthentication),
+                                      clientBuffer(other.clientBuffer), pairCmd(other.pairCmd) {}
+
+// Assignment Operator
 Client &Client::operator=(const Client &other)
 {
     if (this != &other)
@@ -15,7 +31,14 @@ Client &Client::operator=(const Client &other)
         username = other.username;
         realname = other.realname;
         password = other.password;
+        
         authenticated = other.authenticated;
+        passAuthentication = other.passAuthentication;
+        nickAuthentication = other.nickAuthentication;
+        userAuthentication = other.userAuthentication;
+        
+        clientBuffer = other.clientBuffer;
+        pairCmd = other.pairCmd;
     }
     return *this;
 }
@@ -40,12 +63,12 @@ void Client::setRealname(const std::string &realname) { this->realname = realnam
 
 void Client::setPassword(const std::string &password) { this->password = password; }
 
-void Client::authenticate(const std::string &serverPassword)
+void Client::authenticate()
 {
-    if (serverPassword == password)
-        passAuthentication = true;
-    if (passAuthentication && nickAuthentication && userAuthentication)
+    if (getPassAuthentication() && getNickAuthentication() && getUserAuthentication())
         authenticated = true;
+    else 
+        authenticated = false;
 }
 
 void Client::setclientBuffer(const std::string &buffer)
@@ -86,4 +109,8 @@ bool Client::getNickAuthentication() const
 bool Client::getUserAuthentication() const
 {
     return userAuthentication;
+}
+void Client::clearBuffer()
+{
+    clientBuffer.clear();
 }

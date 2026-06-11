@@ -52,7 +52,8 @@ class Client
         void setRealname(const std::string &realname);
         void setPassword(const std::string &password);
         void setclientBuffer(const std::string &buffer);
-        void authenticate(const std::string &serverPassword);
+        void clearBuffer();
+        void authenticate();
         
         void setPassAuthentication(bool status);
         void setNickAuthentication(bool status);

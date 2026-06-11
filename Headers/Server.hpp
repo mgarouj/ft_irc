@@ -25,10 +25,6 @@ class Server
         std::vector<struct pollfd> pollfds;
         std::map<int, Client> clients;
 
-        // AUTHENTICATION
-        void handlePass(int clientFd, std::vector<std::string>& cmds);
-        void handleNick(int clientFd, std::vector<std::string>& cmds);
-        void handleUser(int clientFd, std::vector<std::string>& cmds);
 
     public:
         Server();
@@ -41,7 +37,13 @@ class Server
         void run();
         void acceptConnection();
         void handleClient(int clientFd);
-        // void authenticateClient(Client &client, const std::string &password);
        std::vector<std::string> extractAndSplit(std::string &buffer);
+
         void executeCommand(std::vector<std::string>& cmds, int clientFd);
+
+        void broadcast(const std::string& message);
+        void handlePass(int clientFd, std::vector<std::string>& cmds);
+        void handleNick(int clientFd, std::vector<std::string>& cmds);
+        void handleUser(int clientFd, std::vector<std::string>& cmds);
+        
     };

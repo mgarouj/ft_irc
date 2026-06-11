@@ -135,24 +135,18 @@ void Server::handleClient(int clientFd)
         clients[clientFd].setclientBuffer(bufferString);
         std::string &currentBuffer = clients[clientFd].getclientBuffer();
         size_t pos;
-        if (( (pos=currentBuffer.find('\n') )!= std::string::npos))
+        if ((pos = currentBuffer.find('\n')) != std::string::npos)
         {
-            std::vector<std::string> cmds=  extractAndSplit(currentBuffer);
+            // 1. Copy the command without the '\n'
+            std::string singleCmd = currentBuffer.substr(0, pos);
+            
+            // 2. Erase it from the buffer (including the '\n') so it doesn't loop forever
+            currentBuffer.erase(0, pos + 1);
 
-            if (cmds[0] == "PASS")
-                handlePass(clientFd, cmds);
-            // else if (cmds[0] == "NICK")
-            // else if (cmds[0] == "USER")
-            // else if (cmds[0] == "PING")
-            // else if (cmds[0] == "QUIT")
-            // else if (cmds[0] == "PRIVMSG")
-            // else if (cmds[0] == "NOTICE")
-            // else if (cmds[0] == "JOIN")
-            // else if (cmds[0] == "PART")
-            // else if (cmds[0] == "KICK")
-            // else if (cmds[0] == "INVITE")
-            // else if (cmds[0] == "TOPIC")
-            // else if (cmds[0] == "MODE")
+            // 3. Split the clean string. Now cmds will NEVER have a '\n' inside!
+            std::vector<std::string> cmds = extractAndSplit(singleCmd);
+
+            executeCommand(cmds, clientFd);
         }
         
     }
@@ -170,26 +164,4 @@ std::vector<std::string> Server::extractAndSplit(std::string &buffer)
             resulte.push_back(save);
     }
     return resulte;
-}
-
-// command 
-
-void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
-{
-    std::string respons ;
-    if (cmds[1].empty())
-    {
-        respons = "<command> :Not enough parameters";
-        send(clientFd, respons.c_str(), respons.length(), 0);
-    }
-    if (clients[clientFd].isAuthenticated())
-    {
-        respons = ":You may not reregister";
-        send(clientFd, respons.c_str(), respons.length(), 0);
-    }
-    if (cmds[1] == password)
-        clients[clientFd].setPassAuthentication(true);
-    else 
-        clients[clientFd].setPassAuthentication(false);
-
 }
