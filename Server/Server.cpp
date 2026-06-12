@@ -1,5 +1,21 @@
 #include "../Headers/Server.hpp"
 
+bool Server::isSignal = false;
+
+bool Server::getSignal(){return(isSignal);}
+
+void Server::setSignal(bool S){isSignal = S;}
+
+void Server::signalR(int S)
+{
+    isSignal = true;
+    if (S == SIGINT)
+        std::cout << "\n\n \033[31m Interrupted by SIGINT \033[0m\n" << std::endl;
+    else if (S == SIGQUIT)
+        std::cout << "\n\n \033[31m Interrupted by SIGQUIT \033[0m\n" << std::endl;
+    else
+        std::cout << "\n\n \033[31m Interrupted by signal \033[0m\n" << std::endl;
+}
 
 Server::Server() : password(""), port(0), serverSocket(-1) {}
 

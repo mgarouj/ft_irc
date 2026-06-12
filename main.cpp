@@ -17,6 +17,9 @@ int main(int c, char **v)
     Server s(v[2], std::atoi(v[1]));
     try
     {
+        signal(SIGPIPE, SIG_IGN);
+        signal(SIGINT, s.signalR);
+        signal(SIGQUIT, s.signalR);
         s.start();
     }
     catch (const std::exception &e)
