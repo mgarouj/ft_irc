@@ -2,6 +2,15 @@
 
 bool Server::isSignal = false;
 
+void Server::CloseFds()
+{
+    for (size_t i = 0; i < pollfds.size(); i++)
+    {
+        std::cout << "Closing file descriptor: " << pollfds[i].fd << std::endl;
+        close(pollfds[i].fd);
+    }
+}
+
 bool Server::getSignal(){return(isSignal);}
 
 void Server::setSignal(bool S){isSignal = S;}
@@ -10,11 +19,11 @@ void Server::signalR(int S)
 {
     isSignal = true;
     if (S == SIGINT)
-        std::cout << "\n\n \033[31m Interrupted by SIGINT \033[0m\n" << std::endl;
+        std::cout << "Interrupted by SIGINT" << std::endl;
     else if (S == SIGQUIT)
-        std::cout << "\n\n \033[31m Interrupted by SIGQUIT \033[0m\n" << std::endl;
+        std::cout << "Interrupted by SIGQUIT" << std::endl;
     else
-        std::cout << "\n\n \033[31m Interrupted by signal \033[0m\n" << std::endl;
+        std::cout << "Interrupted by signal" << std::endl;
 }
 
 Server::Server() : password(""), port(0), serverSocket(-1) {}
@@ -69,11 +78,18 @@ void Server::start()
 
 void Server::run()
 {
-    while (true)
+    while (Server::isSignal == false)
     {
         // std::cout << "here" << "Waiting for events..." << std::endl;
         if (poll(pollfds.data(), pollfds.size(), -1) < 0)
+        {
+            // 2. If poll fails because we pressed Ctrl+C, just break the loop peacefully!
+            if (Server::isSignal == true)
+                break;
+            
+            // Otherwise, it's a real error, so throw it.
             throw std::runtime_error("Error: poll() failed to monitor the file descriptors.");
+        }
         for (size_t i = 0; i < pollfds.size(); ++i)
         {
             if (pollfds[i].revents & POLLIN)
@@ -93,6 +109,7 @@ void Server::run()
             }
         }
     }
+    CloseFds();
 }
 
 void Server::acceptConnection()

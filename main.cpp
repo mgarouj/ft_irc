@@ -27,5 +27,8 @@ int main(int c, char **v)
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
+    
+    std::cout << "function is finish" << std::endl;
+
     return 0;
 }

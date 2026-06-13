@@ -24,7 +24,7 @@ fclean: clean
 
 re: fclean all
 
-run: re clean
+run: fclean all clean
 	clear
 	./ft_irc 7777 aaaa
 .PHONY: all clean fclean re

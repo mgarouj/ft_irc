@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Server_HPP
+#define Server_HPP
 
 #include <cstdlib>
 #include <iostream>
@@ -44,12 +45,20 @@ class Server
         void executeCommand(std::vector<std::string>& cmds, int clientFd);
 
         void broadcast(const std::string& message);
+        
+        void CloseFds();
+        bool getSignal();
+        void setSignal(bool S);
+        static void signalR(int S);
+        
         void handlePass(int clientFd, std::vector<std::string>& cmds);
         void handleNick(int clientFd, std::vector<std::string>& cmds);
         void handleUser(int clientFd, std::vector<std::string>& cmds);
         
-
-        bool getSignal();
-        void setSignal(bool S);
-        static void signalR(int S);
+        void handleKick(int clientFd, std::vector<std::string>& cmds);
+        void handleTopic(int clientFd, std::vector<std::string>& cmds);
+        void handleInvite(int clientFd, std::vector<std::string>& cmds);
     };
+
+
+#endif

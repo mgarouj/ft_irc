@@ -1,3 +1,7 @@
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
+
+
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -8,8 +12,6 @@
 #include <vector>
 #include <fcntl.h>
 
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
 
 class Client
 {
@@ -58,6 +60,8 @@ class Client
         void setPassAuthentication(bool status);
         void setNickAuthentication(bool status);
         void setUserAuthentication(bool status);
+
+        
 
 };
 

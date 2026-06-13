@@ -18,6 +18,14 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
         handleNick(clientFd, cmds);
     else if (command == "USER")
         handleUser(clientFd, cmds);
+    else if (command == "KICK")
+        handleKick(clientFd, cmds);
+    else if (command == "INVITE")
+        handleInvite(clientFd, cmds);
+    else if (command == "TOPIC")
+        handleTopic(clientFd, cmds);
+
+        
     // else if (command == "PING")
     //     handlePing(clientFd, cmds);
     // else if (command == "QUIT")
@@ -30,12 +38,6 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
     //     handleJoin(clientFd, cmds);
     // else if (command == "PART")
     //     handlePart(clientFd, cmds);
-    // else if (command == "KICK")
-    //     handleKick(clientFd, cmds);
-    // else if (command == "INVITE")
-    //     handleInvite(clientFd, cmds);
-    // else if (command == "TOPIC")
-    //     handleTopic(clientFd, cmds);
     // else if (command == "MODE")
     //     handleMode(clientFd, cmds);
     else
