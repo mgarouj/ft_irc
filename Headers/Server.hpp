@@ -27,7 +27,7 @@ class Server
         struct sockaddr_in address;
         std::vector<struct pollfd> pollfds;
         std::map<int, Client> clients;
-	std::map<std::string, Channel> channels; // also added part for commands section
+	    std::map<std::string, Channel> channels; // also added part for commands section
         static  bool isSignal;
 
 
@@ -60,6 +60,10 @@ class Server
         void handleKick(int clientFd, std::vector<std::string>& cmds);
         void handleTopic(int clientFd, std::vector<std::string>& cmds);
         void handleInvite(int clientFd, std::vector<std::string>& cmds);
+
+        void handleJoin(int clientFd, std::vector<std::string>& cmds);
+        void handlePrivmsg(int clientFd, std::vector<std::string>& cmds);
+        void handleMode(int clientFd, std::vector<std::string>& cmds);
     };
 
 

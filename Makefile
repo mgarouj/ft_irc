@@ -4,7 +4,7 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 
 # Add your source files here
-SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp ./Commands/Nick.cpp ./Commands/User.cpp
+SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp
 
 OBJS        = $(SRCS:.cpp=.o)
 
