@@ -20,6 +20,8 @@ class Client
         std::string nickname;
         std::string username;
         std::string realname;
+        std::string host;
+        std::string servername;
         std::string password;
 
         bool authenticated;
@@ -30,6 +32,7 @@ class Client
         std::string clientBuffer;
 
         std::vector<std::string> pairCmd;
+        int channels_counter;
 
     public:
         Client();
@@ -42,6 +45,10 @@ class Client
         const std::string &getNickname() const;
         const std::string &getUsername() const;
         const std::string &getRealname() const;
+        const std::string &getHost() const;
+        const std::string &getServername() const;
+        const int &getchannels_counter() const;
+
         std::string &getclientBuffer();
         bool isAuthenticated() const;
         
@@ -53,6 +60,9 @@ class Client
         void setUsername(const std::string &username);
         void setRealname(const std::string &realname);
         void setPassword(const std::string &password);
+        void setHost(const std::string &host);
+        void setServername(const std::string &servername);
+        void setchannels_counter(const int &Channelupdate);
         void setclientBuffer(const std::string &buffer);
         void clearBuffer();
         void authenticate();

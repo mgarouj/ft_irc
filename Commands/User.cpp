@@ -22,6 +22,8 @@ void Server::handleUser(int clientFd, std::vector<std::string>& cmds)
         return;
     }
     clients[clientFd].setUsername(cmds[1]);
+    clients[clientFd].setHost(cmds[2]);
+    clients[clientFd].setServername(cmds[3]);
     clients[clientFd].setUserAuthentication(true);
     clients[clientFd].authenticate();
     if (clients[clientFd].isAuthenticated())

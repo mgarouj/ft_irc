@@ -187,14 +187,23 @@ void Server::handleClient(int clientFd)
 
 std::vector<std::string> Server::extractAndSplit(std::string &buffer)
 {
-    std::string save;
+    std::vector<std::string> args;
     std::stringstream ss(buffer);
-    std::vector<std::string> resulte;
 
-    while (getline(ss, save, ' '))
+    std::string token;
+
+    while (ss >> token)
     {
-        if (!save.empty())
-            resulte.push_back(save);
+        if (token[0] == ':')
+        {
+            std::string rest;
+            std::getline(ss, rest);
+            token.erase(0, 1);
+            token += rest;
+            args.push_back(token);
+            break;
+        }
+        args.push_back(token);
     }
-    return resulte;
+    return args;
 }
