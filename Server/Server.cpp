@@ -137,6 +137,7 @@ void Server::handleClient(int clientFd)
 {
     char buffer[1024];
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+    std::cout << "----buffer: " << buffer << std::endl;
     if (bytesRead == -1)
     {
         std::cerr << "Error: recv() failed to receive data from client " << clientFd << std::endl;

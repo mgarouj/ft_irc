@@ -62,7 +62,6 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
 void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
 {
     std::string respons ;
-    std::cout << "==========size of cmds: " << cmds.size() << std::endl;
     if (cmds.size() < 2)
     {
         respons = "<command> :Not enough parameters";
