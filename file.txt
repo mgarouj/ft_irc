@@ -1,0 +1,98 @@
+split is not correct.
+
+1- added a split and a sendMsg
+
+
+
+
+
+
+
+
+
+
+
+
+######################################################
+INVITE <nickname> <Channel>
+##FAIL##
+-461 INVITE :Not enough parameters //////
+403 #42 :No such channel//////////
+442 #42 :You're not on that channel/////////
+401 john :No such nick/channel///// 
+443 john #42 :is already on channel///
+482 #42 :You're not channel operator/////
+##success##
+:alice INVITE bob :#42 (guest)
+341 bob #42 (inviter)
+
+#######################################################
+KICK <channel> <user> [:reason]
+
+461 KICK :Not enough parameters///
+403 #unknown :No such channel///
+442 #42 :You're not on that channel//
+482 #42 :You're not channel operator///
+401 Nobody :No such nick/channel//////////
+441 Charlie #42 :They aren't on that channel///
+//success//
+:Alice KICK #42 Bob :bye (all see it)
+
+###########################################################
+TOPIC <channel>
+
+
+Client
+    │
+    │ TOPIC #42 :Exam tomorrow
+    ▼
+Server
+
+1. Channel exists?
+        │
+        ├── No → 403////////
+        │
+        ▼
+2. User on channel?
+        │
+        ├── No → 442//////////
+        │
+        ▼
+3. Is this read or write?
+        │
+        ├── Read
+        │      │
+        │      ├── Topic empty → 331
+        │      └── Topic exists → 332
+        │
+        ▼
+4. Write
+        │
+        ├── +t ?
+        │       │
+        │       ├── Yes
+        │       │      │
+        │       │      ├── Operator? → yes
+        │       │      └── no → 482
+        │       │
+        │       ▼
+        └── Store topic
+                │
+                ▼
+        Broadcast TOPIC message
+
+461 TOPIC :Not enough parameters////
+//////////server replies
+332 Bob #42 :Welcome to the 42 IRC server
+331 Bob #42 :No topic is set
+//////////change topic 
+TOPIC <channel> :<new topic>
+:Alice TOPIC #42 :Exam next Monday (seen by all)
+/////////////////////
+403 #unknown :No such channel
+442 #42 :You're not on that channel
+482 #42 :You're not channel operator (after +t)
+
+482 <nick> #42 :You're not channel operator (changing the topic)
+331 <nick> #42 :No topic is set/////
+332 <nick> #42 :Exam on Friday (success only who request changes)

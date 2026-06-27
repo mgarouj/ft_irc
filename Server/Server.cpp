@@ -177,8 +177,9 @@ void Server::handleClient(int clientFd)
             currentBuffer.erase(0, pos + 1);
 
             // 3. Split the clean string. Now cmds will NEVER have a '\n' inside!
-            std::vector<std::string> cmds = extractAndSplit(singleCmd);
-
+            // std::vector<std::string> cmds = extractAndSplit(singleCmd);////weee
+            std::vector<std::string> cmds = split_all(singleCmd);
+            // validPoint = checkPoint(singleCmd);////////////////wee
             executeCommand(cmds, clientFd);
         }
         
@@ -187,23 +188,14 @@ void Server::handleClient(int clientFd)
 
 std::vector<std::string> Server::extractAndSplit(std::string &buffer)
 {
-    std::vector<std::string> args;
+    std::string save;
     std::stringstream ss(buffer);
+    std::vector<std::string> resulte;
 
-    std::string token;
-
-    while (ss >> token)
+    while (getline(ss, save, ' '))
     {
-        if (token[0] == ':')
-        {
-            std::string rest;
-            std::getline(ss, rest);
-            token.erase(0, 1);
-            token += rest;
-            args.push_back(token);
-            break;
-        }
-        args.push_back(token);
+        if (!save.empty())
+            resulte.push_back(save);
     }
-    return args;
+    return resulte;
 }

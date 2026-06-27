@@ -11,45 +11,35 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
         
         command[i] = std::toupper(command[i]);
     }
-    //check if authenticated user
-    if(command != "NICK" && command != "USER" && command != "PASS")
-    {
-        if(!clients[clientFd].isAuthenticated())
-        {
-            std::string response = ":localhost 451 * :You have not registered\r\n";
-            send(clientFd, response.c_str(), response.length(), 0);
-            return;
-        }
-    }
-    
+    std::cout << "command: " << command << " arg: " << cmds[1] << std::endl;
     if (command == "PASS")
         handlePass(clientFd, cmds);
     else if (command == "NICK")
         handleNick(clientFd, cmds);
     else if (command == "USER")
         handleUser(clientFd, cmds);
-    // else if (command == "KICK")
-    //     handleKick(clientFd, cmds);
-    // else if (command == "INVITE")
-    //     handleInvite(clientFd, cmds);
-    // else if (command == "TOPIC")
-    //     handleTopic(clientFd, cmds);
+    else if (command == "KICK")
+        handleKick(clientFd, cmds);
+    else if (command == "INVITE")
+        handleInvite(clientFd, cmds);
+    else if (command == "TOPIC")
+        handleTopic(clientFd, cmds);
 
         
     // else if (command == "PING")
     //     handlePing(clientFd, cmds);
     // else if (command == "QUIT")
     //     handleQuit(clientFd, cmds);
-    else if (command == "PRIVMSG")
-        handlePrivmsg(clientFd, cmds);
+    // else if (command == "PRIVMSG")
+    //     handlePrivmsg(clientFd, cmds);
     // else if (command == "NOTICE")
     //     handleNotice(clientFd, cmds);
-    else if (command == "JOIN")
-        handleJoin(clientFd, cmds);
+    // else if (command == "JOIN")
+    //     handleJoin(clientFd, cmds);
     // else if (command == "PART")
     //     handlePart(clientFd, cmds);
-    else if (command == "MODE")
-        handleMode(clientFd, cmds);
+    // else if (command == "MODE")
+    //     handleMode(clientFd, cmds);
     else
     {
         std::string respons = ":localhost 421 * " + command + " :Unknown command\r\n";

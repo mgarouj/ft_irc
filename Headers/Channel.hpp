@@ -12,17 +12,16 @@ class Channel {
         std::string password; // For +k mode
         std::vector<Client*> members;
         std::vector<Client*> operators;
-        std::vector<std::string> bannedUsers;
-        bool inviteOnly;
+        bool topicRestricted;
+        //booleans for modes inviteOnly (+i), topicRestricted (+t), etc.....
+
     public:
-        Channel();
         Channel(const std::string& name);
         ~Channel();
 
         const std::string& getName() const;
         const std::string& getTopic() const;
-        const std::string& getPass() const;
-        bool HasPass() const;
+        bool isRestricted() const;/////
         void setTopic(const std::string& newTopic);
 
         void addMember(Client* client);
@@ -31,11 +30,7 @@ class Channel {
         
         bool isMember(Client* client) const;
         bool isOperator(Client* client) const;
-        bool isBanned(Client* client) const;
-        bool isInviteOnly() const;
-        bool isChannelFull() const;
         
-        void sendNamesList(int clientFd, const std::string& clientNick);
         void broadcastMessage(const std::string& message, Client* sender);
 };
 

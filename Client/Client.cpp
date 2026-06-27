@@ -53,12 +53,6 @@ const std::string &Client::getUsername() const { return username; }
 
 const std::string &Client::getRealname() const { return realname; }
 
-const std::string &Client::getHost() const { return host; }
-
-const std::string &Client::getServername() const { return servername; }
-
-const int &Client::getchannels_counter() const { return channels_counter; }
-
 bool Client::isAuthenticated() const { return authenticated; }
 
 void Client::setNickname(const std::string &nickname) { this->nickname = nickname; }
@@ -68,12 +62,6 @@ void Client::setUsername(const std::string &username) { this->username = usernam
 void Client::setRealname(const std::string &realname) { this->realname = realname; }
 
 void Client::setPassword(const std::string &password) { this->password = password; }
-
-void Client::setHost(const std::string &host) { this->host = host; }
-
-void Client::setServername(const std::string &servername) { this->host = servername; }
-
-void Client::setchannels_counter(const int &Channelupdate) { this->channels_counter = Channelupdate; }
 
 void Client::authenticate()
 {

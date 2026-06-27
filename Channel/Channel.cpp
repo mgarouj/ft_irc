@@ -2,9 +2,7 @@
 #include <algorithm> 
 #include <sys/socket.h>
 
-Channel::Channel() : name(""), topic(""), password("") {}
-
-Channel::Channel(const std::string& name) : name(name), topic(""), password(""), inviteOnly(false) {}
+Channel::Channel(const std::string& name) : name(name), topic(""), password("") {}
 
 Channel::~Channel() {}
 
@@ -17,17 +15,10 @@ const std::string& Channel::getTopic() const
     return topic; 
 }
 
-const std::string& Channel::getPass() const 
-{ 
-    return password; 
+bool Channel::isRestricted() const
+{
+    return topicRestricted;
 }
-
-bool Channel::HasPass() const 
-{ 
-    return password != "" ? true : false; 
-}
-
-
 void Channel::setTopic(const std::string& newTopic) 
 { 
     topic = newTopic; 
@@ -74,61 +65,15 @@ bool Channel::isOperator(Client* client) const
     return std::find(operators.begin(), operators.end(), client) != operators.end();
 }
 
-bool Channel::isBanned(Client* client) const
-{
-    return std::find(bannedUsers.begin(), bannedUsers.end(), client->getNickname()) != bannedUsers.end();
-}
-
-bool Channel::isInviteOnly() const 
-{
-    return inviteOnly;
-}
-
-bool Channel::isChannelFull() const
-{
-    return (members.size() >= 50);
-}
-
-void Channel::sendNamesList(int clientFd, const std::string& clientNick)
-{
-    std::string prefix = ":localhost 353 " + clientNick + " = " + this->name + " :";
-    std::string currentLine = prefix;
-
-    for (size_t i = 0; i < members.size(); ++i)
-    {
-        std::string userEntry = "";
-        
-        if (isOperator(members[i]))
-            userEntry += "@";
-            
-        userEntry += members[i]->getNickname();
-
-        if (currentLine.length() + userEntry.length() + 1 > 510)
-        {
-            currentLine += "\r\n";
-            send(clientFd, currentLine.c_str(), currentLine.length(), 0);
-            currentLine = prefix; 
-        }
-        currentLine += userEntry + " ";
-    }
-
-    if (currentLine.length() > prefix.length())
-    {
-        currentLine += "\r\n";
-        send(clientFd, currentLine.c_str(), currentLine.length(), 0);
-    }
-    std::string endMsg = ":localhost 366 " + clientNick + " " + this->name + " :End of /NAMES list\r\n";
-    send(clientFd, endMsg.c_str(), endMsg.length(), 0);
-}
-
 void Channel::broadcastMessage(const std::string& message, Client* sender) 
 {
     for (size_t i = 0; i < members.size(); ++i) 
     {
+        // If sender is provided, don't echo the message back to them (useful for PRIVMSG)
+        // If sender is NULL, send to everyone (useful for JOIN, KICK, PART, TOPIC)
         if (sender == NULL || members[i]->getFd() != sender->getFd()) 
         {
             send(members[i]->getFd(), message.c_str(), message.length(), 0);
         }
     }
 }
-
