@@ -14,51 +14,71 @@ Bot::Bot(std::string is, int port, std::string nickBot, std::string passServer):
     serverAddress.sin_port = htons(this->_port);
     serverAddress.sin_addr.s_addr = inet_addr(this->_ipServer.c_str());
 
-
-    connect(botsocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
-
-    std::string authenticate = "PASS " + this->_passServer + "\r\n" + "NICK " + this->_nickBot + "\r\n" + "USER " + this->_nickBot + " 0 * :" + this->_nickBot + "\r\n";
-    send(botsocket, authenticate.c_str(), authenticate.length(), 0);
-     char check_auth[1024];
-    bzero(check_auth, 1024);
-
-    int bytes = recv(botsocket, check_auth, 1023, 0);
-
-    if (bytes > 0)
-    {
-        std::string response = check_auth;
-
-        if (response.find(" 464 ") != std::string::npos) 
-            throw std::runtime_error("Error: Authentication Failed - Incorrect Password.");
-
-        if (response.find(" 433 ") != std::string::npos) 
-            throw std::runtime_error("Error: Authentication Failed - Nickname '" + _nickBot + "' is already in use.");
-
-        if (response.find(" 461 ") != std::string::npos) 
-            throw std::runtime_error("Error: Authentication Failed - Not enough parameters.");
+}
+void Bot::botAuthenticate(std::string &authenticate) {
+    // Send the authentication string
+    if (send(botsocket, authenticate.c_str(), authenticate.length(), 0) < 0) {
+        throw std::runtime_error("Error: Failed to send authentication.");
     }
     
+    std::string full_response = "";
+    char buffer[1024];
+    
+    std::cout << "Waiting for server response..." << std::endl;
+    
+    // The Wait and Accumulate Loop
+    while (true) {
+        memset(buffer, 0, sizeof(buffer)); // Clear the buffer
+        
+        int bytes = recv(botsocket, buffer, sizeof(buffer) - 1, 0);
+        
+        if (bytes <= 0) {
+            throw std::runtime_error("Error: Server disconnected during authentication.");
+        }
+        
+        std::cout << " buffer : " << std::endl;
+        full_response += buffer;
+        std::cout << "Server says: " << buffer; // Print to terminal for debugging
+
+        // Check for SUCCESS (001 RPL_WELCOME)
+        if (full_response.find(" 001 ") != std::string::npos) {
+            std::cout << "\n✅ Bot successfully authenticated!" << std::endl;
+            break; // Authentication complete, exit the loop
+        }
+
+        // Check for ERRORS
+        if (full_response.find(" 464 ") != std::string::npos) 
+            throw std::runtime_error("Error: Authentication Failed - Incorrect Password.");
+        
+        if (full_response.find(" 433 ") != std::string::npos) 
+            throw std::runtime_error("Error: Authentication Failed - Nickname '" + _nickBot + "' is already in use.");
+        
+        if (full_response.find(" 461 ") != std::string::npos) 
+            throw std::runtime_error("Error: Authentication Failed - Not enough parameters.");
+    }
 }
 
+void Bot::run() {
+    if (connect(botsocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
+        throw std::runtime_error("Error: Bot failed to connect.");
+    }
+    std::cout << "Connected to server successfully!" << std::endl;
 
-int main(int c, char **v)
-{   
-    // <ip> <port> <nick> <pass> 
-    if (c != 5)
-    {
-        std::cerr << "./bot <IP of server> <Port> <nickname of Bot> <password of server> "  << std::endl;
-        return 1;
-    }
-    int port = std::atoi(v[2]);
-    try
-    {
-        /* code */
-        Bot bot(v[1], port, v[3], v[4]);
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    return 0;
+    // 1. Send PASS
+    std::string passCmd = "PASS " + this->_passServer + "\r\n";
+    send(botsocket, passCmd.c_str(), passCmd.length(), 0);
+    usleep(100000); // Wait 0.1 seconds so the server has time to process this separately
 
+    // 2. Send NICK
+    std::string nickCmd = "NICK " + this->_nickBot + "\r\n";
+    send(botsocket, nickCmd.c_str(), nickCmd.length(), 0);
+    usleep(100000); // Wait 0.1 seconds
+
+    // 3. Send USER
+    std::string userCmd = "USER " + this->_nickBot + " 0 * :" + this->_nickBot + "\r\n";
+    send(botsocket, userCmd.c_str(), userCmd.length(), 0);
+
+    // 4. Start listening for the Welcome message
+    std::string dummy = "";
+    botAuthenticate(dummy); // Make sure you removed the `send()` from inside botAuthenticate!
 }

@@ -12,7 +12,7 @@ SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.c
 
 OBJS        = $(SRCS:.cpp=.o)
 
-SRCS_B      = ./bonus/bot.cpp
+SRCS_B      = ./bonus/bot.cpp ./bonus/main.cpp
 OBJS_B      = $(SRCS_B:.cpp=.o)
 
 

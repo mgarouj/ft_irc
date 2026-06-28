@@ -55,7 +55,7 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
         std::string respons = ":localhost 421 * " + command + " :Unknown command\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);
     }
-    std::cout << "pass : " << clients[clientFd].getPassAuthentication() << std::endl;
+    std::cout << "pass : " << clients[clientFd].getPassAuthentication() << " | authentication: " << clients[clientFd].isAuthenticated() << std::endl;
     clients[clientFd].clearBuffer();
 }
 

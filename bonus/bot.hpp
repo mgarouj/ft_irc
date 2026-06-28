@@ -28,10 +28,10 @@ class Bot{
         int botsocket;
         sockaddr_in serverAddress;
     public:
-        // Bot();
         Bot(std::string is, int port, std::string nickBot, std::string passServer);
-
-
+        void run();
+        void botAuthenticate(std::string &authenticate);
+        
         
 };
 
