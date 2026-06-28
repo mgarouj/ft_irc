@@ -80,14 +80,10 @@ void Server::run()
 {
     while (Server::isSignal == false)
     {
-        // std::cout << "here" << "Waiting for events..." << std::endl;
         if (poll(pollfds.data(), pollfds.size(), -1) < 0)
         {
-            // 2. If poll fails because we pressed Ctrl+C, just break the loop peacefully!
             if (Server::isSignal == true)
                 break;
-            
-            // Otherwise, it's a real error, so throw it.
             throw std::runtime_error("Error: poll() failed to monitor the file descriptors.");
         }
         for (size_t i = 0; i < pollfds.size(); ++i)
@@ -136,52 +132,38 @@ void Server::acceptConnection()
 void Server::handleClient(int clientFd)
 {
     char buffer[1024];
+    memset(buffer, 0, sizeof(buffer)); 
+
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-    if (bytesRead == -1)
+    if (bytesRead <= 0)
     {
-        std::cerr << "Error: recv() failed to receive data from client " << clientFd << std::endl;
+        if (bytesRead < 0)
+            std::cerr << "Error: recv() failed on client " << clientFd << std::endl;
         return;
     }
-    else if (bytesRead == 0)
-    {
-        std::cout << "Client disconnected: " << clientFd << std::endl;
-        close(clientFd);
-        for (std::vector<struct pollfd>::iterator it = pollfds.begin(); it != pollfds.end(); ++it)
-        {
-            if (it->fd == clientFd)
-            {
-                pollfds.erase(it);
-                break;
-            }
-        }
-        clients.erase(clientFd);
-        return;
+
+    std::string &currentBuffer = clients[clientFd].getclientBuffer();
+    currentBuffer.append(buffer, bytesRead);
+
+    for (std::string::size_type pos = 0; (pos = currentBuffer.find("\r\n", pos)) != std::string::npos;) {
+        currentBuffer.replace(pos, 2, "\n");
     }
-    else
+
+    std::vector<std::string> commandsToRun;
+    size_t pos;
+    while ((pos = currentBuffer.find('\n')) != std::string::npos)
     {
-        buffer[bytesRead] = '\0';
-
-        std::string bufferString(buffer, bytesRead);
-        for (std::string::size_type pos = 0; (pos = bufferString.find("\r\n", pos)) != std::string::npos;)
-            bufferString.replace(pos, 2, "\n");
-
-        clients[clientFd].setclientBuffer(bufferString);
-        std::string &currentBuffer = clients[clientFd].getclientBuffer();
-        size_t pos;
-        if ((pos = currentBuffer.find('\n')) != std::string::npos)
-        {
-            // 1. Copy the command without the '\n'
-            std::string singleCmd = currentBuffer.substr(0, pos);
-            
-            // 2. Erase it from the buffer (including the '\n') so it doesn't loop forever
-            currentBuffer.erase(0, pos + 1);
-
-            // 3. Split the clean string. Now cmds will NEVER have a '\n' inside!
-            std::vector<std::string> cmds = extractAndSplit(singleCmd);
-
-            executeCommand(cmds, clientFd);
-        }
+        std::string singleCmd = currentBuffer.substr(0, pos);
+        currentBuffer.erase(0, pos + 1);
         
+        if (!singleCmd.empty())
+            commandsToRun.push_back(singleCmd);
+    }
+
+    for (size_t i = 0; i < commandsToRun.size(); i++)
+    {
+        std::vector<std::string> cmds = extractAndSplit(commandsToRun[i]);
+        executeCommand(cmds, clientFd);
     }
 }
 

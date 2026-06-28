@@ -64,21 +64,9 @@ void Bot::run() {
     }
     std::cout << "Connected to server successfully!" << std::endl;
 
-    // 1. Send PASS
-    std::string passCmd = "PASS " + this->_passServer + "\r\n";
-    send(botsocket, passCmd.c_str(), passCmd.length(), 0);
-    usleep(100000); // Wait 0.1 seconds so the server has time to process this separately
-
-    // 2. Send NICK
-    std::string nickCmd = "NICK " + this->_nickBot + "\r\n";
-    send(botsocket, nickCmd.c_str(), nickCmd.length(), 0);
-    usleep(100000); // Wait 0.1 seconds
-
-    // 3. Send USER
-    std::string userCmd = "USER " + this->_nickBot + " 0 * :" + this->_nickBot + "\r\n";
-    send(botsocket, userCmd.c_str(), userCmd.length(), 0);
-
-    // 4. Start listening for the Welcome message
-    std::string dummy = "";
-    botAuthenticate(dummy); // Make sure you removed the `send()` from inside botAuthenticate!
+std::string authenticate = "PASS " + this->_passServer + "\r\n" + 
+                               "NICK " + this->_nickBot + "\r\n" + 
+                               "USER " + this->_nickBot + " 0 * :" + this->_nickBot + "\r\n";
+    
+    botAuthenticate(authenticate);
 }
