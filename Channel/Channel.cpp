@@ -2,9 +2,9 @@
 #include <algorithm> 
 #include <sys/socket.h>
 
-Channel::Channel() : name(""), topic(""), password("") {}
+Channel::Channel() : name(""), topic(""), password(""), inviteOnly(false), topicRestricted(false), userLimit(0) {}
 
-Channel::Channel(const std::string& name) : name(name), topic(""), password(""), inviteOnly(false) {}
+Channel::Channel(const std::string& name) : name(name), topic(""), password(""), inviteOnly(false), topicRestricted(false), userLimit(0) {}
 
 Channel::~Channel() {}
 
@@ -22,15 +22,36 @@ const std::string& Channel::getPass() const
     return password; 
 }
 
+
 bool Channel::HasPass() const 
 { 
     return password != "" ? true : false; 
 }
 
 
+void Channel::setPassword(const std::string& newPassword) 
+{ 
+    password = newPassword; 
+}
+
 void Channel::setTopic(const std::string& newTopic) 
 { 
     topic = newTopic; 
+}
+
+void Channel::setinviteOnlyattr(bool is)
+{
+    inviteOnly = is;
+}
+
+void Channel::setTopicRestricted(bool isRestricted)
+{
+    topicRestricted = isRestricted;
+}
+
+void Channel::setUserLimit(size_t limit)
+{
+    userLimit = limit;
 }
 
 void Channel::addMember(Client* client) 
@@ -64,6 +85,17 @@ void Channel::addOperator(Client* client)
     }
 }
 
+void Channel::removeOperator(Client* client)
+{
+    for(size_t i = 0; i < operators.size(); ++i)
+    {
+        if(client->getFd() == operators[i]->getFd())
+        {
+            operators.erase(operators.begin() + i);
+        }
+    }
+}
+
 bool Channel::isMember(Client* client) const 
 {
     return std::find(members.begin(), members.end(), client) != members.end();
@@ -86,9 +118,13 @@ bool Channel::isInviteOnly() const
 
 bool Channel::isChannelFull() const
 {
-    return (members.size() >= 50);
+    return (userLimit == 0 ? false : members.size() >= userLimit);
 }
 
+bool Channel::isTopicRestricted() const
+{
+    return topicRestricted;
+}
 void Channel::sendNamesList(int clientFd, const std::string& clientNick)
 {
     std::string prefix = ":localhost 353 " + clientNick + " = " + this->name + " :";

@@ -29,7 +29,7 @@ class Server
         std::map<int, Client> clients;
 	    std::map<std::string, Channel> channels; // also added part for commands section
         static  bool isSignal;
-
+        bool isColenExists;
 
     public:
         Server();
@@ -52,6 +52,8 @@ class Server
         bool getSignal();
         void setSignal(bool S);
         static void signalR(int S);
+
+        bool getisColenExits() const;
         
         void handlePass(int clientFd, std::vector<std::string>& cmds);
         void handleNick(int clientFd, std::vector<std::string>& cmds);

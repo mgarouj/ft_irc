@@ -14,6 +14,9 @@ class Channel {
         std::vector<Client*> operators;
         std::vector<std::string> bannedUsers;
         bool inviteOnly;
+        bool topicRestricted;
+        size_t userLimit;
+
     public:
         Channel();
         Channel(const std::string& name);
@@ -23,7 +26,11 @@ class Channel {
         const std::string& getTopic() const;
         const std::string& getPass() const;
         bool HasPass() const;
+        void setPassword(const std::string& newPassword);
         void setTopic(const std::string& newTopic);
+        void setinviteOnlyattr(bool is);
+        void setTopicRestricted(bool isRestricted);
+        void setUserLimit(size_t limit);
 
         void addMember(Client* client);
         void removeMember(Client* client);
@@ -34,9 +41,11 @@ class Channel {
         bool isBanned(Client* client) const;
         bool isInviteOnly() const;
         bool isChannelFull() const;
+        bool isTopicRestricted() const;
         
         void sendNamesList(int clientFd, const std::string& clientNick);
         void broadcastMessage(const std::string& message, Client* sender);
+        void removeOperator(Client* client);
 };
 
 #endif

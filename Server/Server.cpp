@@ -13,6 +13,8 @@ void Server::CloseFds()
 
 bool Server::getSignal(){return(isSignal);}
 
+bool Server::getisColenExits() const {return(isColenExists);}
+
 void Server::setSignal(bool S){isSignal = S;}
 
 void Server::signalR(int S)
@@ -28,9 +30,9 @@ void Server::signalR(int S)
 
 Server::Server() : password(""), port(0), serverSocket(-1) {}
 
-Server::Server(const std::string &password, const int port) : password(password), port(port), serverSocket(-1) {}
+Server::Server(const std::string &password, const int port) : password(password), port(port), serverSocket(-1), isColenExists(0) {}
 
-Server::Server(const Server &other) : password(other.password), port(other.port), serverSocket(other.serverSocket) {}
+Server::Server(const Server &other) : password(other.password), port(other.port), serverSocket(other.serverSocket), isColenExists(other.isColenExists) {}
 
 Server &Server::operator=(const Server &other)
 {
@@ -181,7 +183,7 @@ void Server::handleClient(int clientFd)
 
             executeCommand(cmds, clientFd);
         }
-        
+        isColenExists = 0;
     }
 }
 
@@ -196,6 +198,7 @@ std::vector<std::string> Server::extractAndSplit(std::string &buffer)
     {
         if (token[0] == ':')
         {
+            isColenExists = 1;
             std::string rest;
             std::getline(ss, rest);
             token.erase(0, 1);
