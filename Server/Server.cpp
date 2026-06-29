@@ -118,7 +118,11 @@ void Server::acceptConnection()
         std::cerr << "Error: accept() failed to accept a new connection." << std::endl;
         return;
     }
-    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cerr << "Error: fcntl() failed to set the socket to non-blocking mode." << std::endl;
+		return ;
+	}
     struct pollfd clientPfd;
     clientPfd.fd = clientFd;
     clientPfd.events = POLLIN;
