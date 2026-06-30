@@ -21,29 +21,19 @@ void Bot::botAuthenticate(std::string &authenticate) {
     if (send(botsocket, authenticate.c_str(), authenticate.length(), 0) < 0) {
         throw std::runtime_error("Error: Failed to send authentication.");
     }
-    
     std::string full_response = "";
     char buffer[1024];
-    
-    std::cout << "Waiting for server response..." << std::endl;
-
-    while (true) {
         memset(buffer, 0, sizeof(buffer)); 
-        
         int bytes = recv(botsocket, buffer, sizeof(buffer) - 1, 0);
-        
         if (bytes <= 0) {
             throw std::runtime_error("Error: Server disconnected during authentication.");
         }
-        
-        std::cout << " buffer : " << std::endl;
-        full_response += buffer;
-        std::cout << "Server says: " << buffer;
+        full_response = buffer;
         
         if (full_response.find(" 001 ") != std::string::npos) {
             std::cout << "\n✅ Bot successfully authenticated!" << std::endl;
-            break;
         }
+
         if (full_response.find(" 464 ") != std::string::npos) 
             throw std::runtime_error("Error: Authentication Failed - Incorrect Password.");
         
@@ -52,14 +42,12 @@ void Bot::botAuthenticate(std::string &authenticate) {
         
         if (full_response.find(" 461 ") != std::string::npos) 
             throw std::runtime_error("Error: Authentication Failed - Not enough parameters.");
-    }
 }
 
 void Bot::run() {
     if (connect(botsocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
         throw std::runtime_error("Error: Bot failed to connect.");
     }
-    std::cout << "Connected to server successfully!" << std::endl;
 
 std::string authenticate = "PASS " + this->_passServer + "\r\n" + 
                                "NICK " + this->_nickBot + "\r\n" + 
