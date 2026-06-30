@@ -64,13 +64,13 @@ void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
     std::string respons ;
     if (cmds.size() < 2)
     {
-        respons = "<command> :Not enough parameters";
+        respons = ":localhost 461 * PASS :Not enough parameters\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);
         return;
     }
     if (clients[clientFd].isAuthenticated())
     {
-        respons = ":You may not reregister";
+        respons = ":localhost 462 * :You may not reregister";
         send(clientFd, respons.c_str(), respons.length(), 0);
         return;
     }
@@ -82,7 +82,8 @@ void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
     }
     else 
     {
+        respons = ":localhost 464 * :Password incorrect\r\n";
+        send(clientFd, respons.c_str(), respons.length(), 0);
         clients[clientFd].setPassAuthentication(false);
     }
-
 }
