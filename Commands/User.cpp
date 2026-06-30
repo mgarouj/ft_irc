@@ -11,7 +11,7 @@ void Server::handleUser(int clientFd, std::vector<std::string>& cmds)
     }
     if (cmds.size() < 5)
     {
-        messageResspons = ":localhost 461 * USER :Not enough parameters\r\n";
+        messageResspons = "461 USER :Not enough parameters\r\n";
         send(clientFd, messageResspons.c_str(), messageResspons.size(), 0);
         return;
     }
@@ -28,12 +28,9 @@ void Server::handleUser(int clientFd, std::vector<std::string>& cmds)
     clients[clientFd].authenticate();
     if (clients[clientFd].isAuthenticated())
     {
-        
-        // Send the official 001 Welcome message!
         std::string nick = clients[clientFd].getNickname();
         std::string welcome = ":localhost 001 " + nick + " :Welcome to the Internet Relay Network, " + nick + "\r\n";
         send(clientFd, welcome.c_str(), welcome.length(), 0);
-        
         std::cout << "User " << nick << " successfully registered!" << std::endl;
     }
 }

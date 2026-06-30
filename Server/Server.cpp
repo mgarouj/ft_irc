@@ -82,14 +82,10 @@ void Server::run()
 {
     while (Server::isSignal == false)
     {
-        // std::cout << "here" << "Waiting for events..." << std::endl;
         if (poll(pollfds.data(), pollfds.size(), -1) < 0)
         {
-            // 2. If poll fails because we pressed Ctrl+C, just break the loop peacefully!
             if (Server::isSignal == true)
                 break;
-            
-            // Otherwise, it's a real error, so throw it.
             throw std::runtime_error("Error: poll() failed to monitor the file descriptors.");
         }
         for (size_t i = 0; i < pollfds.size(); ++i)
@@ -107,7 +103,7 @@ void Server::run()
                 close(pollfds[i].fd);
                 pollfds.erase(pollfds.begin() + i);
                 clients.erase(pollfds[i].fd);
-                --i; // Adjust index after erasing
+                --i;
             }
         }
     }
@@ -124,7 +120,11 @@ void Server::acceptConnection()
         std::cerr << "Error: accept() failed to accept a new connection." << std::endl;
         return;
     }
-    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cerr << "Error: fcntl() failed to set the socket to non-blocking mode." << std::endl;
+		return ;
+	}
     struct pollfd clientPfd;
     clientPfd.fd = clientFd;
     clientPfd.events = POLLIN;
@@ -138,16 +138,17 @@ void Server::acceptConnection()
 void Server::handleClient(int clientFd)
 {
     char buffer[1024];
+    memset(buffer, 0, sizeof(buffer)); 
+
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-    if (bytesRead == -1)
+    if (bytesRead <= 0) 
     {
-        std::cerr << "Error: recv() failed to receive data from client " << clientFd << std::endl;
-        return;
-    }
-    else if (bytesRead == 0)
-    {
-        std::cout << "Client disconnected: " << clientFd << std::endl;
+        if (bytesRead == 0)
+            std::cout << "Client " << clientFd << " disconnected." << std::endl;
+        else
+            std::cerr << "Error: recv() failed on client " << clientFd << std::endl;
         close(clientFd);
+        clients.erase(clientFd);
         for (std::vector<struct pollfd>::iterator it = pollfds.begin(); it != pollfds.end(); ++it)
         {
             if (it->fd == clientFd)
@@ -156,11 +157,21 @@ void Server::handleClient(int clientFd)
                 break;
             }
         }
-        clients.erase(clientFd);
         return;
     }
-    else
+
+    std::string &currentBuffer = clients[clientFd].getclientBuffer();
+    currentBuffer.append(buffer, bytesRead);
+
+    for (std::string::size_type pos = 0; (pos = currentBuffer.find("\r\n", pos)) != std::string::npos;) {
+        currentBuffer.replace(pos, 2, "\n");
+    }
+
+    std::vector<std::string> commandsToRun;
+    size_t pos;
+    while ((pos = currentBuffer.find('\n')) != std::string::npos)
     {
+<<<<<<< HEAD
         buffer[bytesRead] = '\0';
 
         std::string bufferString(buffer, bytesRead);
@@ -184,6 +195,18 @@ void Server::handleClient(int clientFd)
             executeCommand(cmds, clientFd);
         }
         isColenExists = 0;
+=======
+        std::string singleCmd = currentBuffer.substr(0, pos);
+        currentBuffer.erase(0, pos + 1);
+        
+        if (!singleCmd.empty())
+            commandsToRun.push_back(singleCmd);
+    }
+    for (size_t i = 0; i < commandsToRun.size(); i++)
+    {
+        std::vector<std::string> cmds = extractAndSplit(commandsToRun[i]);
+        executeCommand(cmds, clientFd);
+>>>>>>> alibranch
     }
 }
 
@@ -201,8 +224,12 @@ std::vector<std::string> Server::extractAndSplit(std::string &buffer)
             isColenExists = 1;
             std::string rest;
             std::getline(ss, rest);
+            std::cout << "Rest of the line after colon: " << rest << std::endl;
+            std::cout << "Token before erase: " << token << std::endl;
             token.erase(0, 1);
+            std::cout << "Token after erase: " << token << std::endl;
             token += rest;
+            std::cout << "Token after concatenation: " << token << std::endl;
             args.push_back(token);
             break;
         }

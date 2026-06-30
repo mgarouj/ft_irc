@@ -52,26 +52,26 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
         handleMode(clientFd, cmds);
     else
     {
-        std::string respons = ":localhost 421 * " + command + " :Unknown command\r\n";
+        std::string respons = "421 * " + command + " :Unknown command\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);
     }
-    std::cout << "pass : " << clients[clientFd].getPassAuthentication() << std::endl;
+    std::cout << "pass : " << clients[clientFd].getPassAuthentication() << " | authentication: " << clients[clientFd].isAuthenticated() << std::endl;
     clients[clientFd].clearBuffer();
 }
 
 void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
 {
     std::string respons ;
-    std::cout << "==========size of cmds: " << cmds.size() << std::endl;
     if (cmds.size() < 2)
     {
-        respons = "<command> :Not enough parameters";
+        respons = "461 PASS :Not enough parameters\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);
         return;
     }
-    if (clients[clientFd].isAuthenticated())
+    if (clients[clientFd].getPassAuthentication() == 1)
     {
-        respons = ":You may not reregister";
+        std::cout << "clients[clientFd].getPassAuthentication()" << clients[clientFd].getPassAuthentication() << std::endl;
+        respons = "462 :You may not reregister\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);
         return;
     }
@@ -83,7 +83,8 @@ void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
     }
     else 
     {
+        respons = "464 :Password incorrect\r\n";
+        send(clientFd, respons.c_str(), respons.length(), 0);
         clients[clientFd].setPassAuthentication(false);
     }
-
 }
