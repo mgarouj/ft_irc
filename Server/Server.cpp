@@ -101,7 +101,7 @@ void Server::run()
                 close(pollfds[i].fd);
                 pollfds.erase(pollfds.begin() + i);
                 clients.erase(pollfds[i].fd);
-                --i; // Adjust index after erasing
+                --i;
             }
         }
     }
@@ -139,10 +139,22 @@ void Server::handleClient(int clientFd)
     memset(buffer, 0, sizeof(buffer)); 
 
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-    if (bytesRead <= 0)
+    if (bytesRead <= 0) 
     {
-        if (bytesRead < 0)
+        if (bytesRead == 0)
+            std::cout << "Client " << clientFd << " disconnected." << std::endl;
+        else
             std::cerr << "Error: recv() failed on client " << clientFd << std::endl;
+        close(clientFd);
+        clients.erase(clientFd);
+        for (std::vector<struct pollfd>::iterator it = pollfds.begin(); it != pollfds.end(); ++it)
+        {
+            if (it->fd == clientFd)
+            {
+                pollfds.erase(it);
+                break;
+            }
+        }
         return;
     }
 
@@ -163,7 +175,6 @@ void Server::handleClient(int clientFd)
         if (!singleCmd.empty())
             commandsToRun.push_back(singleCmd);
     }
-
     for (size_t i = 0; i < commandsToRun.size(); i++)
     {
         std::vector<std::string> cmds = extractAndSplit(commandsToRun[i]);
@@ -184,8 +195,12 @@ std::vector<std::string> Server::extractAndSplit(std::string &buffer)
         {
             std::string rest;
             std::getline(ss, rest);
+            std::cout << "Rest of the line after colon: " << rest << std::endl;
+            std::cout << "Token before erase: " << token << std::endl;
             token.erase(0, 1);
+            std::cout << "Token after erase: " << token << std::endl;
             token += rest;
+            std::cout << "Token after concatenation: " << token << std::endl;
             args.push_back(token);
             break;
         }

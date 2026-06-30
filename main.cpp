@@ -29,7 +29,7 @@ int main(int c, char **v)
     }
     
     std::cout << "function is finish" << std::endl;
-    s.CloseFds();
+
 
     return 0;
 }
