@@ -31,6 +31,7 @@ class Bot{
         Bot(std::string is, int port, std::string nickBot, std::string passServer);
         void run();
         void botAuthenticate(std::string &authenticate);
+        void listenAndRespond();
         
         
 };
