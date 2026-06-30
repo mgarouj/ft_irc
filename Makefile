@@ -1,23 +1,15 @@
-<<<<<<< HEAD
 NAME        = ircserv
-=======
-NAME        = ft_irc
 BOT_NAME    = irc_bot
->>>>>>> alibranch
 
 CXX         = c++
 # FIXED TYPO: Changed CXXCXXFLAGSS to CXXFLAGS
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 
 # Add your source files here
-<<<<<<< HEAD
-SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp ./Commands/Join.cpp \
-				./Commands/Privmsg.cpp ./Commands/Mode.cpp ./Commands/Invite.cpp ./Commands/Kick.cpp ./Commands/Topic.cpp
-=======
 SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp \
               ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp \
-              ./Commands/Join.cpp ./Commands/Privmsg.cpp ./Commands/Mode.cpp
->>>>>>> alibranch
+              ./Commands/Join.cpp ./Commands/Privmsg.cpp ./Commands/Mode.cpp \
+				./Commands/Invite.cpp ./Commands/Kick.cpp ./Commands/Topic.cpp
 
 OBJS        = $(SRCS:.cpp=.o)
 
@@ -50,7 +42,7 @@ re: fclean all
 
 run: fclean all clean
 	clear
-	./ft_irc 7777 aaaa
+	./ircserv 7777 aaaa
 
 # FIXED: Added 'bonus' and 'run' to .PHONY
 .PHONY: all clean fclean re bonus run

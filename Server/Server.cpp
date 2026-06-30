@@ -171,42 +171,17 @@ void Server::handleClient(int clientFd)
     size_t pos;
     while ((pos = currentBuffer.find('\n')) != std::string::npos)
     {
-<<<<<<< HEAD
-        buffer[bytesRead] = '\0';
-
-        std::string bufferString(buffer, bytesRead);
-        for (std::string::size_type pos = 0; (pos = bufferString.find("\r\n", pos)) != std::string::npos;)
-            bufferString.replace(pos, 2, "\n");
-
-        clients[clientFd].setclientBuffer(bufferString);
-        std::string &currentBuffer = clients[clientFd].getclientBuffer();
-        size_t pos;
-        if ((pos = currentBuffer.find('\n')) != std::string::npos)
-        {
-            // 1. Copy the command without the '\n'
-            std::string singleCmd = currentBuffer.substr(0, pos);
-            
-            // 2. Erase it from the buffer (including the '\n') so it doesn't loop forever
-            currentBuffer.erase(0, pos + 1);
-
-            // 3. Split the clean string. Now cmds will NEVER have a '\n' inside!
-            std::vector<std::string> cmds = extractAndSplit(singleCmd);
-
-            executeCommand(cmds, clientFd);
-        }
-        isColenExists = 0;
-=======
-        std::string singleCmd = currentBuffer.substr(0, pos);
+       std::string singleCmd = currentBuffer.substr(0, pos);
         currentBuffer.erase(0, pos + 1);
         
         if (!singleCmd.empty())
             commandsToRun.push_back(singleCmd);
-    }
+     }
     for (size_t i = 0; i < commandsToRun.size(); i++)
     {
         std::vector<std::string> cmds = extractAndSplit(commandsToRun[i]);
         executeCommand(cmds, clientFd);
->>>>>>> alibranch
+        isColenExists = 0;
     }
 }
 
