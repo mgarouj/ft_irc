@@ -11,7 +11,7 @@ void Server::handleUser(int clientFd, std::vector<std::string>& cmds)
     }
     if (cmds.size() < 5)
     {
-        messageResspons = ":localhost 461 * USER :Not enough parameters\r\n";
+        messageResspons = "461 USER :Not enough parameters\r\n";
         send(clientFd, messageResspons.c_str(), messageResspons.size(), 0);
         return;
     }

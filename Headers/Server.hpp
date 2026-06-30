@@ -1,6 +1,6 @@
 #ifndef Server_HPP
 #define Server_HPP
-
+#include <cstring>
 #include <cstdlib>
 #include <iostream>
 #include <iostream>
