@@ -90,7 +90,8 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
                 send(clientFd, Message.c_str(), Message.length(), 0);
                 continue;
             }
-
+            if(channel.isMember(client))
+                return;
             channel.addMember(client);
             Message = clientPrefix + " JOIN :" + channel.getName() + "\r\n";
             channel.broadcastMessage(Message, NULL);
