@@ -1,10 +1,11 @@
-NAME        = ft_irc
+NAME        = ircserv
 
 CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 
 # Add your source files here
-SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp ./Commands/Join.cpp ./Commands/Privmsg.cpp ./Commands/Mode.cpp
+SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp ./Commands/Join.cpp \
+				./Commands/Privmsg.cpp ./Commands/Mode.cpp ./Commands/Invite.cpp ./Commands/Kick.cpp ./Commands/Topic.cpp
 
 OBJS        = $(SRCS:.cpp=.o)
 

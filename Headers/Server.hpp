@@ -66,7 +66,12 @@ class Server
         void handleJoin(int clientFd, std::vector<std::string>& cmds);
         void handlePrivmsg(int clientFd, std::vector<std::string>& cmds);
         void handleMode(int clientFd, std::vector<std::string>& cmds);
+
+        bool CheckExist(int clientFd, std::string &channel);
+        bool CheckNew(std::string &nick, std::string &channel, int clientFd);
+        bool validTopic(std::string &channel, int clientFd);
     };
 
+void sendMsg(int fd, int code, const std::string& msg);
 
 #endif

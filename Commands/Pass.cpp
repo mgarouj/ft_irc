@@ -28,12 +28,12 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
         handleNick(clientFd, cmds);
     else if (command == "USER")
         handleUser(clientFd, cmds);
-    // else if (command == "KICK")
-    //     handleKick(clientFd, cmds);
-    // else if (command == "INVITE")
-    //     handleInvite(clientFd, cmds);
-    // else if (command == "TOPIC")
-    //     handleTopic(clientFd, cmds);
+    else if (command == "KICK")
+        handleKick(clientFd, cmds);
+    else if (command == "INVITE")
+        handleInvite(clientFd, cmds);
+    else if (command == "TOPIC")
+        handleTopic(clientFd, cmds);
 
         
     // else if (command == "PING")
