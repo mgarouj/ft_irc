@@ -16,7 +16,7 @@
 #include <map>
 #include <signal.h>
 #include "Client.hpp"
-#include "Channel.hpp" // added part for commands section
+#include "Channel.hpp"
 
 class Server
 {
@@ -27,7 +27,7 @@ class Server
         struct sockaddr_in address;
         std::vector<struct pollfd> pollfds;
         std::map<int, Client> clients;
-	    std::map<std::string, Channel> channels; // also added part for commands section
+	    std::map<std::string, Channel> channels;
         static  bool isSignal;
         bool isColenExists;
 

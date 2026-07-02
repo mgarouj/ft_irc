@@ -9,7 +9,7 @@ class Channel {
     private:
         std::string name;
         std::string topic;
-        std::string password; // For +k mode
+        std::string password;
         std::vector<Client*> members;
         std::vector<Client*> operators;
         std::vector<std::string> bannedUsers;

@@ -2,10 +2,10 @@ NAME        = ircserv
 BOT_NAME    = irc_bot
 
 CXX         = c++
-# FIXED TYPO: Changed CXXCXXFLAGSS to CXXFLAGS
+
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 
-# Add your source files here
+
 SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp \
               ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp \
               ./Commands/Join.cpp ./Commands/Privmsg.cpp ./Commands/Mode.cpp \
@@ -25,7 +25,6 @@ $(NAME): $(OBJS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# FIXED: 'bonus' is now a rule that builds the 'irc_bot' executable
 bonus: $(BOT_NAME)
 
 $(BOT_NAME): $(OBJS_B)
@@ -44,5 +43,4 @@ run: fclean all clean
 	clear
 	./ircserv 7777 aaaa
 
-# FIXED: Added 'bonus' and 'run' to .PHONY
 .PHONY: all clean fclean re bonus run
