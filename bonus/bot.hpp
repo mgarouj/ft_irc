@@ -1,8 +1,5 @@
 #ifndef BOT_HPP
 #define BOT_HPP
-
-
-#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <iostream>
@@ -19,7 +16,6 @@
 #include <signal.h>
 #include <arpa/inet.h>
 
-
 class Bot{
     private:
         std::string _ipServer;
@@ -29,13 +25,16 @@ class Bot{
         int botsocket;
         sockaddr_in serverAddress;
     public:
+        Bot();
         Bot(std::string is, int port, std::string nickBot, std::string passServer);
+        Bot(const Bot &other);
+        ~Bot();
+        Bot &operator=(const Bot &other);
+
         void run();
+        void init();
         void botAuthenticate(std::string &authenticate);
         void listenAndRespond();
-        
-        
 };
-
 
 #endif

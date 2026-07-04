@@ -1,19 +1,31 @@
 #include "bot.hpp"
 
 
-// Bot::Bot(){ipServer(""), }
+Bot::Bot(): _ipServer(""), _port(0), _nickBot(""), _passServer("") {}
 
+Bot::Bot(std::string is, int port, std::string nickBot, std::string passServer): _port(port), _nickBot(nickBot), _passServer(passServer){
+    if (is == "localhost")
+        this->_ipServer = "127.0.0.1";
+    else
+        this->_ipServer = is;
+}
 
+Bot::Bot(const Bot &other): _ipServer(other._ipServer), _port(other._port), _nickBot(other._nickBot), _passServer(other._passServer){}
 
+Bot::~Bot() {
+    if (botsocket >= 0) {
+        close(botsocket);
+    }
+}
 
-Bot::Bot(std::string is, int port, std::string nickBot, std::string passServer): _ipServer(is), _port(port), _nickBot(nickBot), _passServer(passServer)
-{
-    this->botsocket = socket(AF_INET, SOCK_STREAM, 0);
-
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(this->_port);
-    serverAddress.sin_addr.s_addr = inet_addr(this->_ipServer.c_str());
-
+Bot &Bot::operator=(const Bot &other) {
+    if (this != &other) {
+        _ipServer = other._ipServer;
+        _port = other._port;
+        _nickBot = other._nickBot;
+        _passServer = other._passServer;
+    }
+    return *this;
 }
 
 void Bot::botAuthenticate(std::string &authenticate) {
@@ -44,14 +56,28 @@ void Bot::botAuthenticate(std::string &authenticate) {
             throw std::runtime_error("Error: Authentication Failed - Not enough parameters.");
 }
 
-void Bot::run() {
-    if (connect(botsocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
-        throw std::runtime_error("Error: Bot failed to connect.");
-    }
+void Bot::init()
+{
+    this->botsocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->botsocket < 1)
+        throw std::runtime_error("Error: Bot failed to create socket.");
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_port = htons(this->_port);
+    serverAddress.sin_addr.s_addr = inet_addr(this->_ipServer.c_str());
+    if (fcntl(botsocket, F_SETFL, O_NONBLOCK) < 0)
+        throw std::runtime_error("Error: Bot failed to set socket to non-blocking mode.");
+    
+}
 
-std::string authenticate = "PASS " + this->_passServer + "\r\n" + 
-                               "NICK " + this->_nickBot + "\r\n" + 
-                               "USER " + this->_nickBot + " 0 * :" + this->_nickBot + "\r\n";
+void Bot::run()
+{
+    this->init();
+    if (connect(botsocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0)
+        throw std::runtime_error("Error: Bot failed to connect.");
+
+    std::string authenticate = "PASS " + this->_passServer + "\r\n" + 
+                                "NICK " + this->_nickBot + "\r\n" + 
+                                "USER " + this->_nickBot + " 0 * :" + this->_nickBot + "\r\n";
     
     botAuthenticate(authenticate);
     listenAndRespond();

@@ -1,4 +1,5 @@
 #include "bot.hpp"
+
 int main(int c, char **v)
 {   
     if (c != 5)
