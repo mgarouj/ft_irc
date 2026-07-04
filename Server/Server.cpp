@@ -196,12 +196,8 @@ std::vector<std::string> Server::extractAndSplit(std::string &buffer)
             isColenExists = 1;
             std::string rest;
             std::getline(ss, rest);
-            std::cout << "Rest of the line after colon: " << rest << std::endl;
-            std::cout << "Token before erase: " << token << std::endl;
             token.erase(0, 1);
-            std::cout << "Token after erase: " << token << std::endl;
             token += rest;
-            std::cout << "Token after concatenation: " << token << std::endl;
             args.push_back(token);
             break;
         }
