@@ -64,9 +64,6 @@ void Bot::init()
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(this->_port);
     serverAddress.sin_addr.s_addr = inet_addr(this->_ipServer.c_str());
-    if (fcntl(botsocket, F_SETFL, O_NONBLOCK) < 0)
-        throw std::runtime_error("Error: Bot failed to set socket to non-blocking mode.");
-    
 }
 
 void Bot::run()
