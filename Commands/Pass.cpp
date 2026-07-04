@@ -10,7 +10,7 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
     {
         command[i] = std::toupper(command[i]);
     }
-    //check if authenticated user
+
     if(command != "NICK" && command != "USER" && command != "PASS")
     {
         if(!clients[clientFd].isAuthenticated())
