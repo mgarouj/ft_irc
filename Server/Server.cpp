@@ -128,8 +128,7 @@ void Server::acceptConnection()
     pollfds.push_back(clientPfd);
     clients[clientFd] = Client(clientFd);
     clients[clientFd].setHost(inet_ntoa(clientAddress.sin_addr));
-    std::cout << clients[clientFd].getHost() << std::endl;
-    std::cout << "New client connected: " << clientFd << std::endl;
+    std::cout << "New client connected: [" << clientFd << "]" <<std::endl;
 }
 
 
