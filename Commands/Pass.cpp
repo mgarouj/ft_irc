@@ -8,7 +8,6 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
     std::string command = cmds[0].substr(0, cmds[0].size());
     for (size_t i = 0; i < command.length(); ++i)
     {
-        
         command[i] = std::toupper(command[i]);
     }
 
@@ -45,7 +44,6 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
         std::string respons = "421 * " + command + " :Unknown command\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);
     }
-    std::cout << "pass : " << clients[clientFd].getPassAuthentication() << " | authentication: " << clients[clientFd].isAuthenticated() << std::endl;
     clients[clientFd].clearBuffer();
 }
 
@@ -71,7 +69,7 @@ void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
         clients[clientFd].setPassAuthentication(true);
         clients[clientFd].setPassword(password);
     }
-    else 
+    else  
     {
         respons = "464 :Password incorrect\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);

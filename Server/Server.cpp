@@ -52,18 +52,13 @@ void Server::start()
     std::cout << "Server started on port " << port << " with password " << password << std::endl;
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0)
-    {
         throw std::runtime_error("Failed to create socket");
-    }
     int opt = 1;
     if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
-    {
         throw std::runtime_error("Error: setsockopt() failed");
-    }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(port);
-
     if (bind(serverSocket, (struct sockaddr* )&address, sizeof(address)))
         throw std::runtime_error("Failed to bind socket");
     if (listen(serverSocket, SOMAXCONN) == -1)
@@ -131,6 +126,8 @@ void Server::acceptConnection()
     clientPfd.revents = 0;
     pollfds.push_back(clientPfd);
     clients[clientFd] = Client(clientFd);
+    clients[clientFd].setHost(inet_ntoa(clientAddress.sin_addr));
+    std::cout << clients[clientFd].getHost() << std::endl;
     std::cout << "New client connected: " << clientFd << std::endl;
 }
 
