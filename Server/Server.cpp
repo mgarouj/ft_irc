@@ -13,7 +13,6 @@ void Server::CloseFds()
 
 bool Server::getSignal(){return(isSignal);}
 
-bool Server::getisColenExits() const {return(isColenExists);}
 
 void Server::setSignal(bool S){isSignal = S;}
 
@@ -30,9 +29,9 @@ void Server::signalR(int S)
 
 Server::Server() : password(""), port(0), serverSocket(-1) {}
 
-Server::Server(const std::string &password, const int port) : password(password), port(port), serverSocket(-1), isColenExists(0) {}
+Server::Server(const std::string &password, const int port) : password(password), port(port), serverSocket(-1), serverName("ircserv.com"), isColenExists(0) {}
 
-Server::Server(const Server &other) : password(other.password), port(other.port), serverSocket(other.serverSocket), isColenExists(other.isColenExists) {}
+Server::Server(const Server &other) : password(other.password), port(other.port), serverSocket(other.serverSocket), serverName(other.serverName), isColenExists(other.isColenExists) {}
 
 Server &Server::operator=(const Server &other)
 {
@@ -46,6 +45,8 @@ Server &Server::operator=(const Server &other)
 }
 
 Server::~Server() {}
+
+bool Server::getisColenExits() const {return(isColenExists);}
 
 void Server::start()
 {
@@ -77,7 +78,7 @@ void Server::run()
 {
     while (Server::isSignal == false)
     {
-        if (poll(pollfds.data(), pollfds.size(), -1) < 0)
+        if (poll(&pollfds[0], pollfds.size(), -1) < 0)
         {
             if (Server::isSignal == true)
                 break;
@@ -134,7 +135,7 @@ void Server::acceptConnection()
 
 void Server::handleClient(int clientFd)
 {
-    char buffer[1024];
+    char buffer[512];
     memset(buffer, 0, sizeof(buffer)); 
 
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
@@ -208,4 +209,52 @@ std::vector<std::string> Server::extractAndSplit(std::string &buffer)
         args.push_back(token);
     }
     return args;
+}
+
+
+void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
+{
+    if (cmds.empty() || cmds[0].empty())
+        return;
+
+    std::string command = cmds[0].substr(0, cmds[0].size());
+    for (size_t i = 0; i < command.length(); ++i)
+    {
+        command[i] = std::toupper(command[i]);
+    }
+
+    if(command != "NICK" && command != "USER" && command != "PASS")
+    {
+        if(!clients[clientFd].isAuthenticated())
+        {
+            std::string response = ":localhost 451 * :You have not registered\r\n";
+            send(clientFd, response.c_str(), response.length(), 0);
+            return;
+        }
+    }
+    
+    if (command == "PASS")
+        handlePass(clientFd, cmds);
+    else if (command == "NICK")
+        handleNick(clientFd, cmds);
+    else if (command == "USER")
+        handleUser(clientFd, cmds);
+    else if (command == "KICK")
+        handleKick(clientFd, cmds);
+    else if (command == "INVITE")
+        handleInvite(clientFd, cmds);
+    else if (command == "TOPIC")
+        handleTopic(clientFd, cmds);
+    else if (command == "PRIVMSG")
+        handlePrivmsg(clientFd, cmds);
+    else if (command == "JOIN")
+        handleJoin(clientFd, cmds);
+    else if (command == "MODE")
+        handleMode(clientFd, cmds);
+    else
+    {
+        std::string respons = "421 * " + command + " :Unknown command\r\n";
+        send(clientFd, respons.c_str(), respons.length(), 0);
+    }
+    clients[clientFd].clearBuffer();
 }

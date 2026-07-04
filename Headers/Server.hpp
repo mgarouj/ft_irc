@@ -30,7 +30,9 @@ class Server
         std::map<int, Client> clients;
 	    std::map<std::string, Channel> channels;
         static  bool isSignal;
+        std::string serverName;
         bool isColenExists;
+        std::string getErrorMsg(int errCode, const std::string& detail);
 
     public:
         Server();
@@ -71,6 +73,7 @@ class Server
         bool CheckExist(int clientFd, std::string &channel);
         bool CheckNew(std::string &nick, std::string &channel, int clientFd);
         bool validTopic(std::string &channel, int clientFd);
+        void sendError(int clientFd, int errCode, const std::string& detail = "");
     };
 
 void sendMsg(int fd, int code, const std::string& msg);

@@ -2,23 +2,19 @@
 
 void Server::handleUser(int clientFd, std::vector<std::string>& cmds)
 {
-    std::string messageResspons;
     if (!clients[clientFd].getPassAuthentication())
     {
-        messageResspons = ":localhost 464 * :Password incorrect\r\n";
-        send(clientFd, messageResspons.c_str(), messageResspons.length(), 0);
+        sendError(clientFd, 451);
         return;
     }
     if (cmds.size() < 5)
     {
-        messageResspons = "461 USER :Not enough parameters\r\n";
-        send(clientFd, messageResspons.c_str(), messageResspons.size(), 0);
+        sendError(clientFd, 461, "USER");
         return;
     }
     if (clients[clientFd].isAuthenticated())
     {
-        messageResspons = ":localhost 462 " + clients[clientFd].getNickname() + " :Unauthorized command (already registered)\r\n";
-        send(clientFd, messageResspons.c_str(), messageResspons.size(), 0);
+        sendError(clientFd, 462);
         return;
     }
     clients[clientFd].setUsername(cmds[1]);

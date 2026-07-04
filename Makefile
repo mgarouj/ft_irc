@@ -6,7 +6,7 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 
 
-SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Commands/Pass.cpp \
+SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Server/ErrorMsg.cpp  ./Commands/Pass.cpp \
               ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp \
               ./Commands/Join.cpp ./Commands/Privmsg.cpp ./Commands/Mode.cpp \
 				./Commands/Invite.cpp ./Commands/Kick.cpp ./Commands/Topic.cpp

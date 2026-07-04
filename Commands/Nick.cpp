@@ -13,41 +13,48 @@ void Server::broadcast(const std::string& message)
 
 void Server::handleNick(int clientFd, std::vector<std::string>& cmds)
 {
-    std::string respons;
     if (!clients[clientFd].getPassAuthentication())
     {
-        respons = "464 NICK :Password incorrect\r\n";
-        send(clientFd, respons.c_str(), respons.length(), 0);
+        sendError(clientFd, 451);
         return;
     }
     if (cmds.size() < 2 || cmds[1].empty())
     {
-        respons = "431 :No nickname given\r\n";
-        send(clientFd, respons.c_str(), respons.length(), 0);
+        sendError(clientFd, 431);
         return;
     }
     std::string newNick = cmds[1];
 
-    if (newNick.find_first_of(" ,*?!@1234567890") != std::string::npos || newNick[0] == '#' || newNick[0] == ':') 
+    if (newNick.length() > 9) 
+        newNick = newNick.substr(0, 9);
+    std::string specialChars = "-[]\\`^{}_"; 
+    if (!std::isalpha(newNick[0]) && specialChars.find(newNick[0]) == std::string::npos)
     {
-        respons = "432 <nick> :Erroneous nickname\r\n";
-        send(clientFd, respons.c_str(), respons.length(), 0);
+        sendError(clientFd, 432, newNick);
         return;
     }
-    for (std::map<int, Client>::iterator i = clients.begin(); i != clients.end(); i++)
-        if (newNick == i->second.getNickname()){
-            respons = "433 <nick> :Nickname is already in use \r\n";
-            send(clientFd, respons.c_str(), respons.length(), 0);
+    for (size_t i = 1; i < newNick.length(); ++i)
+    {
+        if (!std::isalnum(newNick[i]) && specialChars.find(newNick[i]) == std::string::npos)
+        {
+            sendError(clientFd, 432, newNick);
             return;
         }
-
+    }
+    for (std::map<int, Client>::iterator i = clients.begin(); i != clients.end(); i++)
+    {
+        if (i->second.getNickname() == newNick && i->first != clientFd)
+        {
+            sendError(clientFd, 433, newNick);
+            return;
+        }
+    }
     std::string oldNick = clients[clientFd].getNickname();
-
     clients[clientFd].setNickname(newNick);
     clients[clientFd].setNickAuthentication(true);
     if (clients[clientFd].isAuthenticated() && !oldNick.empty())
     {
-        std::string notify = ":" + oldNick + " NICK " + newNick + "\r\n";
+        std::string notify = ":" + oldNick + " NICK :" + newNick + "\r\n";
         broadcast(notify);
     }
 }
