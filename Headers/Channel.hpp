@@ -42,6 +42,7 @@ class Channel {
         bool isInviteOnly() const;
         bool isChannelFull() const;
         bool isTopicRestricted() const;
+        bool isEmpty() const;
         
         void sendNamesList(int clientFd, const std::string& clientNick);
         void broadcastMessage(const std::string& message, Client* sender);

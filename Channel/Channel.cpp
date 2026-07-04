@@ -125,6 +125,12 @@ bool Channel::isTopicRestricted() const
 {
     return topicRestricted;
 }
+
+bool Channel::isEmpty() const
+{
+    return (members.empty());
+}
+
 void Channel::sendNamesList(int clientFd, const std::string& clientNick)
 {
     std::string prefix = ":localhost 353 " + clientNick + " = " + this->name + " :";
