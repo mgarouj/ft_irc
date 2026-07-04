@@ -1,17 +1,38 @@
 #include "Headers/Server.hpp"
 
+void isValidParameter(int c, char **v) 
+{
+    if (c != 3) 
+        throw std::invalid_argument("Usage: ./ircserv <port> <password>");
+    std::string portStr(v[1]);
+    if (portStr.empty())
+        throw std::invalid_argument("Error: Port cannot be empty.");
+    for (size_t i = 0; i < portStr.length(); ++i) 
+        if (!std::isdigit(portStr[i])) 
+            throw std::invalid_argument("Error: Port must contain only digits.");
+    
+    int port = std::atoi(portStr.c_str());
+    if (port < 1 || port > 65535) 
+        throw std::invalid_argument("Error: Port must be between 1 and 65535.");
+
+    std::string password(v[2]);
+    if (password.empty()) 
+        throw std::invalid_argument("Error: Password cannot be empty.");
+
+    for (size_t i = 0; i < password.length(); ++i) 
+        if (std::isspace(password[i]) || !std::isprint(password[i])) 
+            throw std::invalid_argument("Error: Password contains invalid characters (spaces and control chars are not allowed).");
+}
 
 int main(int c, char **v)
 {
-    if (c != 3)
+    try
     {
-        std::cerr << "Usage: " << v[0] << " <port> <password>" << std::endl;
-        return 1;
+        isValidParameter(c, v);
     }
-    int port = std::atoi(v[1]);
-    if (port <= 0 || port > 65535)
+    catch(const std::exception& e)
     {
-        std::cerr << "Error: Invalid port number. Please provide a port number between 1 and 65535." << std::endl;
+        std::cerr << e.what() << '\n';
         return 1;
     }
     Server s(v[2], std::atoi(v[1]));
@@ -27,9 +48,5 @@ int main(int c, char **v)
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
-    
-    std::cout << "function is finish" << std::endl;
-
-
     return 0;
 }
