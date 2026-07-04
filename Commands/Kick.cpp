@@ -4,7 +4,7 @@ void Server::handleKick(int clientFd, std::vector<std::string>& cmds)
 {
 
     if (cmds.size() < 4)
-        sendMsg(clientFd, 461, " KICK :Not enough parameters");
+        sendError(clientFd, 461, "KICK");
     else 
     {
         std::string channel = cmds[1];
@@ -20,13 +20,19 @@ void Server::handleKick(int clientFd, std::vector<std::string>& cmds)
                     break;
             }
             if (it1 == clients.end())
-                sendMsg(clientFd, 401, nick + " :No such nick/channel");
+                sendError(clientFd, 401, nick);
             else if (!(it->second.isMember(&(it1->second))))
                 sendMsg(clientFd, 441, nick + " " + channel + " :They aren't on that channel");
             else
             {
                 it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r", &clients[clientFd]);
                 it->second.removeMember(&(it1->second));
+                if(it->second.isEmpty())
+                {
+                    std::map<std::string, Channel>::iterator it2 = channels.find(it->first);
+                    if (it2 != channels.end())
+                        channels.erase(it2);
+                }
             }
         }
     }

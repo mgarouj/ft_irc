@@ -5,7 +5,7 @@ bool Server::validTopic(std::string &channel, int clientFd)
     std::map<std::string,Channel>::iterator it = channels.find(channel);
     if (it == channels.end())
     {
-        sendMsg(clientFd, 403, " :No such channel");
+        sendError(clientFd, 403, channel);
         return false;
     }
     else
@@ -15,7 +15,7 @@ bool Server::validTopic(std::string &channel, int clientFd)
         {
             if (!it->second.isMember(&(it1->second)))
             {
-                sendMsg(clientFd, 442, channel + " :You're not on that channel");
+                sendError(clientFd, 403, channel);
                 return false;
             }
         }
@@ -28,7 +28,7 @@ bool Server::validTopic(std::string &channel, int clientFd)
 void Server::handleTopic(int clientFd, std::vector<std::string>& cmds)
 {
     if (cmds.size() < 2)
-        sendMsg(clientFd, 461, " TOPIC :Not enough parameters");
+        sendError(clientFd, 461, "TOPIC");
     else
     {
         std::string channel = cmds[1];
@@ -47,7 +47,10 @@ void Server::handleTopic(int clientFd, std::vector<std::string>& cmds)
             {
                 std::string reason = cmds[2];
                 if (it->second.isTopicRestricted() && !(it->second.isOperator(&(it1->second))))
-                    sendMsg(clientFd, 482, clients[clientFd].getNickname() + " " + channel + " :You're not channel operator");
+                {
+                    std::string message = clients[clientFd].getNickname() + " " + channel + " :You're not channel operator";
+                    sendError(clientFd, 482, message);
+                }
                 else
                 {
                     it->second.setTopic(reason);

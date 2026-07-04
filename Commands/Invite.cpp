@@ -13,7 +13,7 @@ bool Server::CheckExist(int clientFd, std::string &channel)
     std::map<std::string, Channel>::iterator it = channels.find(channel);
     if (it == channels.end())
     {
-        sendMsg(clientFd, 403, " :No such channel");
+        sendError(clientFd, 403);
         return false;
     }
     else
@@ -23,12 +23,12 @@ bool Server::CheckExist(int clientFd, std::string &channel)
         {
             if (!it->second.isMember(&(it1->second)))
             {
-                sendMsg(clientFd, 442, channel + " :You're not on that channel");
+                sendError(clientFd, 442, channel);
                 return false;
             }
             else if (!it->second.isOperator(&(it1->second)))
             {
-                sendMsg(clientFd, 482, channel + " ::You're not channel operator");/// make sure
+                sendError(clientFd, 482, channel);
                 return false;
             }
         }
@@ -47,7 +47,7 @@ bool Server::CheckNew(std::string &nick, std::string &channel, int clientFd)
     }
     if (it == clients.end())
     {
-        sendMsg(clientFd, 401, nick + " :No such nick/channel");
+        sendError(clientFd, 401, nick);
         return false;
     }
     else
@@ -64,7 +64,7 @@ bool Server::CheckNew(std::string &nick, std::string &channel, int clientFd)
 void Server::handleInvite(int clientFd, std::vector<std::string>& cmds)
 {
     if (cmds.size() < 3)
-        sendMsg(clientFd, 461, " INVITE :Not enough parameters");
+        sendError(clientFd, 461, "INVITE");
     else 
     {
         std::string New = cmds[1];
@@ -80,6 +80,7 @@ void Server::handleInvite(int clientFd, std::vector<std::string>& cmds)
             }
             it1->second.addMember(&(it->second));
             sendMsg(it->first,001,":" + clients[clientFd].getNickname() + " INVITE " + it->second.getNickname() + " :" + channel);
+            it1->second.sendNamesList(it->first, it->second.getNickname());
             sendMsg(clientFd, 341, " " +  New + " " + channel);
         }
     }
