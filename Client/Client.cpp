@@ -2,17 +2,14 @@
 
 #include "../Headers/Client.hpp"
 
-// Default Constructor
 Client::Client() : fd(-1), nickname(""), username(""), realname(""), password(""), 
                    authenticated(false), passAuthentication(false), 
                    nickAuthentication(false), userAuthentication(false) {}
 
-// Parameterized Constructor
 Client::Client(int fd) : fd(fd), nickname(""), username(""), realname(""), password(""), 
                          authenticated(false), passAuthentication(false), 
                          nickAuthentication(false), userAuthentication(false) {}
 
-// Copy Constructor
 Client::Client(const Client &other) : fd(other.fd), nickname(other.nickname), 
                                       username(other.username), realname(other.realname), 
                                       password(other.password), authenticated(other.authenticated),
@@ -21,7 +18,6 @@ Client::Client(const Client &other) : fd(other.fd), nickname(other.nickname),
                                       userAuthentication(other.userAuthentication),
                                       clientBuffer(other.clientBuffer), pairCmd(other.pairCmd) {}
 
-// Assignment Operator
 Client &Client::operator=(const Client &other)
 {
     if (this != &other)
@@ -125,4 +121,14 @@ bool Client::getUserAuthentication() const
 void Client::clearBuffer()
 {
     clientBuffer.clear();
+}
+
+const std::string &Client::getHostname() const 
+{
+    return this->hostname;
+}
+
+void Client::setHostname(const std::string &host) 
+{
+    this->hostname = host;
 }

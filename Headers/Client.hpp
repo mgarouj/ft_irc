@@ -33,6 +33,7 @@ class Client
 
         std::vector<std::string> pairCmd;
         int channels_counter;
+        std::string hostname;
 
     public:
         Client();
@@ -71,6 +72,9 @@ class Client
         void setNickAuthentication(bool status);
         void setUserAuthentication(bool status);
 
+
+        const std::string &getHostname() const;
+        void setHostname(const std::string &host);
         
 
 };

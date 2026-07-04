@@ -69,7 +69,7 @@ void Server::handlePass(int clientFd, std::vector<std::string>& cmds)
         clients[clientFd].setPassAuthentication(true);
         clients[clientFd].setPassword(password);
     }
-    else 
+    else  
     {
         respons = "464 :Password incorrect\r\n";
         send(clientFd, respons.c_str(), respons.length(), 0);

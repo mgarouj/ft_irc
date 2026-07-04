@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <map>
 #include <signal.h>
+#include <arpa/inet.h>
 #include "Client.hpp"
 #include "Channel.hpp" // added part for commands section
 
