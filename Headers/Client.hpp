@@ -33,7 +33,6 @@ class Client
 
         std::vector<std::string> pairCmd;
         int channels_counter;
-        std::string host;
 
     public:
         Client();
