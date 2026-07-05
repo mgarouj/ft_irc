@@ -6,15 +6,13 @@ void Server::handlePrivmsg(int clientFd, std::vector<std::string>& cmds)
     std::string Message = "";
     if(cmds.size() == 1)
     {
-        Message = ":localhost 411 " + client->getNickname() + " :Not enough parameters\r\n";
-        send(clientFd, Message.c_str(), Message.length(), 0);
+        sendError(clientFd, 411, client->getNickname());
         return;
     }
 
     if(!getisColenExits() || cmds.size() < 3)
     {
-        Message = ":localhost 412 " + client->getNickname() + " :Not enough parameters\r\n";
-        send(clientFd, Message.c_str(), Message.length(), 0);
+        sendError(clientFd, 412, client->getNickname());
         return;
     }
 
@@ -36,21 +34,20 @@ void Server::handlePrivmsg(int clientFd, std::vector<std::string>& cmds)
             {
                 if(!channel->second.isMember(client))
                 {
-                    Message = ":localhost 404 " + client->getNickname() + " " + channel->second.getName() + " :Cannot send to channel\r\n";
-                    send(clientFd, Message.c_str(), Message.length(), 0);
+                    sendError(clientFd, 404, client->getNickname());
                     continue;
                 }
                 else
                 {
-                    Message = ":" + client->getNickname() + "!" + client->getUsername() + "@localhost PRIVMSG " + channel->second.getName() + ":" + cmds[2] + "\r\n";
+                    Message = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PRIVMSG " + channel->second.getName() + ":" + cmds[2] + "\r\n";
                     channel->second.broadcastMessage(Message, client);
                     continue;
                 }
             }
             else
             {
-                Message = ":localhost 401 " + client->getNickname() + " " + Target +" :No such nick/channel\r\n";
-                send(clientFd, Message.c_str(), Message.length(), 0);
+                Message = client->getNickname() + " " + Target;
+                sendError(clientFd, 401, Message);
                 continue;
             }
         }
@@ -59,18 +56,18 @@ void Server::handlePrivmsg(int clientFd, std::vector<std::string>& cmds)
             bool userFound = false;
             for(std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); it++)
             {
-                if(it->second.getNickname() == Target)
+                if(it->second.getNickname() == Target && it->second.getUserAuthentication())
                 {
                     userFound = true;
-                    Message =  ":" + client->getNickname() + "!" + client->getUsername() + "@localhost PRIVMSG " + it->second.getNickname() + ":" + cmds[2] + "\r\n";
+                    Message =  ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PRIVMSG " + it->second.getNickname() + ":" + cmds[2] + "\r\n";
                     send(it->first, Message.c_str(), Message.length(), 0);
                     break;
                 }   
             }
             if(!userFound)
             {
-                Message = ":localhost 401 " + client->getNickname() + " " + Target +" :No such nick/channel\r\n";
-                send(clientFd, Message.c_str(), Message.length(), 0);
+                Message = client->getNickname() + " " + Target;
+                sendError(clientFd, 401, Message);
             }
         }
     }

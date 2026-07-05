@@ -8,16 +8,15 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
 
     if (cmds.size() < 2)
     {
-        Message = ":localhost 411 " + client->getNickname() + " :Not enough parameters\r\n";
-        send(clientFd, Message.c_str(), Message.length(), 0);
+        sendError(clientFd, 411, client->getNickname());
         return;
     }
 
     std::string Target = cmds[1];
     if (channels.find(Target) == channels.end())
     {
-        Message = ":localhost 401 " + client->getNickname() + " " + Target +" :No such channel\r\n";
-        send(clientFd, Message.c_str(), Message.length(), 0);
+        Message = client->getNickname() + " " + Target;
+        sendError(clientFd, 401, Message);
         return;
     }
 
@@ -32,8 +31,8 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
 
     if (!channel.isOperator(client))
     {
-        Message = ":localhost 482 " + client->getNickname() + " " + Target +" :Permission Denied (Operators only)\r\n";
-        send(clientFd, Message.c_str(), Message.length(), 0);
+        Message = client->getNickname() + " " + Target;
+        sendError(clientFd, 482, Message);
         return;
     }
 
@@ -137,14 +136,14 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
         }
         else
         {
-            Message = ":localhost 472 " + client->getNickname() + " " + c + " :is unknown mode char to me\r\n";
-            send(clientFd, Message.c_str(), Message.length(), 0);
+            Message = client->getNickname() + " " + c;
+            sendError(clientFd, 472, Message);
         }
     }
 
     if (successfulModes.length() > 0 && successfulModes != "+" && successfulModes != "-")
     {
-        Message = ":" + client->getNickname() + "!" + client->getUsername() + "@localhost MODE " + Target + " " + successfulModes + successfulArgs + "\r\n";
+        Message = ":" + client->getNickname() + "!" + client->getUsername() + "@"+ client->getHost() + " MODE " + Target + " " + successfulModes + successfulArgs + "\r\n";
         channel.broadcastMessage(Message, NULL);
     }
 }

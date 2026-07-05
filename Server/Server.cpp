@@ -144,6 +144,28 @@ void Server::handleClient(int clientFd)
             std::cout << "Client " << clientFd << " disconnected." << std::endl;
         else
             std::cerr << "Error: recv() failed on client " << clientFd << std::endl;
+        std::string Message = ":" + clients[clientFd].getNickname() + "!" + clients[clientFd].getUsername() + "@" + clients[clientFd].getHost() + " QUIT\r\n";
+        for (std::map<std::string, Channel>::iterator ite = channels.begin(); ite != channels.end(); ite++)
+        {
+            Client *client = &clients[clientFd];
+            if (ite->second.isMember(client))
+            {
+                ite->second.broadcastMessage(Message, client);
+                ite->second.removeMember(&clients[clientFd]);
+                if(clients[clientFd].getchannels_counter() >= 0)
+                    client->setchannels_counter(client->getchannels_counter() - 1);
+                if(ite->second.isEmpty())
+                {
+                    std::map<std::string, Channel>::iterator it = channels.find(ite->first);
+                    if (it != channels.end()){
+                        channels.erase(it);
+                    }
+                    if(channels.size() == 0)
+                        break;
+                }
+            }
+        }
+        
         close(clientFd);
         clients.erase(clientFd);
         for (std::vector<struct pollfd>::iterator it = pollfds.begin(); it != pollfds.end(); ++it)
@@ -222,8 +244,7 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
     {
         if(!clients[clientFd].isAuthenticated())
         {
-            std::string response = ":localhost 451 * :You have not registered\r\n";
-            send(clientFd, response.c_str(), response.length(), 0);
+            sendError(clientFd, 451);
             return;
         }
     }
@@ -247,9 +268,6 @@ void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
     else if (command == "MODE")
         handleMode(clientFd, cmds);
     else
-    {
-        std::string respons = "421 * " + command + " :Unknown command\r\n";
-        send(clientFd, respons.c_str(), respons.length(), 0);
-    }
+        sendError(clientFd, 421, command);
     clients[clientFd].clearBuffer();
 }

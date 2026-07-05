@@ -4,10 +4,8 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
 {
     Client* client = &clients[clientFd];
     std::string Message = "";
-
     if (cmds.size() == 1) {
-        Message = ":localhost 461 " + client->getNickname() + " JOIN :Not enough parameters\r\n";
-        send(clientFd, Message.c_str(), Message.length(), 0);
+        sendError(clientFd, 461, "JOIN");
         return;
     }
 
@@ -23,10 +21,13 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
                 if(ite->second.isEmpty())
                 {
                     std::map<std::string, Channel>::iterator it = channels.find(ite->first);
-                    if (it != channels.end())
+                    if (it != channels.end()){
                         channels.erase(it);
+                    }
+                    if(channels.size() == 0)
+                        break;
                 }
-            }
+            } 
         }
         return;
     }
@@ -52,17 +53,17 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
         std::string currentChan = tempChannels[i];
         std::string currentKey = (i < tempKeys.size()) ? tempKeys[i] : "";
 
-        if (currentChan.empty() || (currentChan[0] != '#' && currentChan[0] != '&'))
+        if (currentChan.empty() || currentChan.size() == 1 || (currentChan[0] != '#' && currentChan[0] != '&'))
         {
-            Message = ":localhost 403 " + client->getNickname() + " " + currentChan + " :No such channel\r\n";
-            send(clientFd, Message.c_str(), Message.length(), 0);
+            Message = client->getNickname() + " " + currentChan;
+            sendError(clientFd, 403, Message);
             continue; 
         }
 
         if (client->getchannels_counter() >= 30)
         {
-            Message = ":localhost 405 " + client->getNickname() + " " + currentChan + " :You have reached the channel limit\r\n";
-            send(clientFd, Message.c_str(), Message.length(), 0);
+            Message = client->getNickname() + " " + currentChan;
+            sendError(clientFd, 405, Message);
             continue; 
         }
 
@@ -72,22 +73,28 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
         if (ite != channels.end())
         {
             Channel& channel = ite->second;
-            if (channel.isInviteOnly() && !(ite->second.isInvited(client)))
+            if (channel.isBanned(client))
             {
-                Message = ":localhost 473 " + client->getNickname() + " " + channel.getName() + " :Cannot join channel (+i)\r\n";
-                send(clientFd, Message.c_str(), Message.length(), 0);
+                Message = client->getNickname() + " " + channel.getName();
+                sendError(clientFd, 474, Message);
+                continue;
+            }
+            if (channel.isInviteOnly())
+            {
+                Message = client->getNickname() + " " + channel.getName();
+                sendError(clientFd, 473, Message);
                 continue;
             }
             if (channel.isChannelFull())
             {
-                Message = ":localhost 471 " + client->getNickname() + " " + channel.getName() + " :Cannot join channel (+l)\r\n";
-                send(clientFd, Message.c_str(), Message.length(), 0);
+                Message = client->getNickname() + " " + channel.getName();
+                sendError(clientFd, 471, Message);
                 continue;
             }
-            if (channel.HasPass() && channel.getPass() != currentKey && !(ite->second.isInvited(client)))
+            if (channel.HasPass() && channel.getPass() != currentKey)
             {
-                Message = ":localhost 475 " + client->getNickname() + " " + channel.getName() + " :Cannot join channel (+k)\r\n";
-                send(clientFd, Message.c_str(), Message.length(), 0);
+                Message = client->getNickname() + " " + channel.getName();
+                sendError(clientFd, 475, Message);
                 continue;
             }
             if(channel.isMember(client))
@@ -99,14 +106,14 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
 
             if (channel.isTopicRestricted())
             {
-                Message = ":localhost 332 " + client->getNickname() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n";
+                Message = ": " + serverName + " 332 " + client->getNickname() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n";
                 send(clientFd, Message.c_str(), Message.length(), 0);
             }
             channel.sendNamesList(clientFd, client->getNickname());
         } 
         else
         {
-            channels.insert(std::make_pair(currentChan, Channel(currentChan)));
+            channels.insert(make_pair(currentChan, Channel(currentChan)));
             Channel& newChannel = channels.find(currentChan)->second;
             
             newChannel.addMember(client);
@@ -115,7 +122,6 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
             Message = clientPrefix + " JOIN :" + currentChan + "\r\n";
             send(clientFd, Message.c_str(), Message.length(), 0);
             client->setchannels_counter(client->getchannels_counter() + 1);
-
             newChannel.sendNamesList(clientFd, client->getNickname());
         }
     }
