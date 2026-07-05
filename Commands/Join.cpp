@@ -78,7 +78,7 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
                 send(clientFd, Message.c_str(), Message.length(), 0);
                 continue;
             }
-            if (channel.isInviteOnly())
+            if (channel.isInviteOnly() && client->getInviteFlage() == 0)
             {
                 Message = ":localhost 473 " + client->getNickname() + " " + channel.getName() + " :Cannot join channel (+i)\r\n";
                 send(clientFd, Message.c_str(), Message.length(), 0);

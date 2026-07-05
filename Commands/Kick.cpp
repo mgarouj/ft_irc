@@ -25,6 +25,8 @@ void Server::handleKick(int clientFd, std::vector<std::string>& cmds)
                 sendMsg(clientFd, 441, nick + " " + channel + " :They aren't on that channel");
             else
             {
+                if (it1->second.getInviteFlage() == 1)
+                    it1->second.setInviteFlage(0);
                 it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r", &clients[clientFd]);
                 it->second.removeMember(&(it1->second));
                 if(it->second.isEmpty())

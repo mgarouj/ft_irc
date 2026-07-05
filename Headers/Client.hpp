@@ -23,6 +23,7 @@ class Client
         std::string host;
         std::string servername;
         std::string password;
+        int invite_f;
 
         bool authenticated;
         bool passAuthentication;
@@ -71,6 +72,8 @@ class Client
         void setNickAuthentication(bool status);
         void setUserAuthentication(bool status);
 
+        void setInviteFlage(int f);
+        int  getInviteFlage() const;
 
         const std::string &getHostname() const;
         void setHostname(const std::string &host);

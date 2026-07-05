@@ -78,7 +78,7 @@ void Server::handleInvite(int clientFd, std::vector<std::string>& cmds)
                 if (it->second.getNickname() == New)
                     break;
             }
-            it1->second.addMember(&(it->second));
+            it->second.setInviteFlage(1);
             sendMsg(it->first,001,":" + clients[clientFd].getNickname() + " INVITE " + it->second.getNickname() + " :" + channel);
             it1->second.sendNamesList(it->first, it->second.getNickname());
             sendMsg(clientFd, 341, " " +  New + " " + channel);
