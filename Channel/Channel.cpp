@@ -174,3 +174,25 @@ void Channel::broadcastMessage(const std::string& message, Client* sender)
     }
 }
 
+void Channel::addInvited(Client* client) 
+{
+    if (!isInvited(client)) 
+    {
+        guests.push_back(client);
+    }
+}
+
+void Channel::removeInvited(Client* client) 
+{
+    std::vector<Client*>::iterator it = std::find(guests.begin(), guests.end(), client);
+    if (it != guests.end()) 
+    {
+        guests.erase(it);
+    }
+
+}
+
+bool Channel::isInvited(Client* client) const 
+{
+    return std::find(guests.begin(), guests.end(), client) != guests.end();
+}

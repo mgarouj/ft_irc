@@ -8,14 +8,14 @@ Client::Client() : fd(-1), nickname(""), username(""), realname(""), password(""
                    nickAuthentication(false), userAuthentication(false) {}
 
 // Parameterized Constructor
-Client::Client(int fd) : fd(fd), nickname(""), username(""), realname(""), password(""), invite_f(0), 
+Client::Client(int fd) : fd(fd), nickname(""), username(""), realname(""), password(""), 
                          authenticated(false), passAuthentication(false), 
                          nickAuthentication(false), userAuthentication(false) {}
 
 // Copy Constructor
 Client::Client(const Client &other) : fd(other.fd), nickname(other.nickname), 
                                       username(other.username), realname(other.realname), 
-                                      password(other.password), invite_f(other.invite_f), authenticated(other.authenticated),
+                                      password(other.password), authenticated(other.authenticated),
                                       passAuthentication(other.passAuthentication), 
                                       nickAuthentication(other.nickAuthentication), 
                                       userAuthentication(other.userAuthentication),
@@ -31,7 +31,6 @@ Client &Client::operator=(const Client &other)
         username = other.username;
         realname = other.realname;
         password = other.password;
-        invite_f = other.invite_f;
         
         authenticated = other.authenticated;
         passAuthentication = other.passAuthentication;
@@ -125,14 +124,4 @@ bool Client::getUserAuthentication() const
 void Client::clearBuffer()
 {
     clientBuffer.clear();
-}
-
-void Client::setInviteFlage(int f)
-{
-    invite_f = f;
-}
-
-int Client::getInviteFlage() const
-{
-    return invite_f;
 }

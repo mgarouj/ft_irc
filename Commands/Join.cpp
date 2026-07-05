@@ -72,13 +72,7 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
         if (ite != channels.end())
         {
             Channel& channel = ite->second;
-            if (channel.isBanned(client))
-            {
-                Message = ":localhost 474 " + client->getNickname() + " " + channel.getName() + " :Cannot join channel (+b)\r\n";
-                send(clientFd, Message.c_str(), Message.length(), 0);
-                continue;
-            }
-            if (channel.isInviteOnly() && client->getInviteFlage() == 0)
+            if (channel.isInviteOnly() && !(ite->second.isInvited(client)))
             {
                 Message = ":localhost 473 " + client->getNickname() + " " + channel.getName() + " :Cannot join channel (+i)\r\n";
                 send(clientFd, Message.c_str(), Message.length(), 0);
@@ -90,7 +84,7 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
                 send(clientFd, Message.c_str(), Message.length(), 0);
                 continue;
             }
-            if (channel.HasPass() && channel.getPass() != currentKey)
+            if (channel.HasPass() && channel.getPass() != currentKey && !(ite->second.isInvited(client)))
             {
                 Message = ":localhost 475 " + client->getNickname() + " " + channel.getName() + " :Cannot join channel (+k)\r\n";
                 send(clientFd, Message.c_str(), Message.length(), 0);

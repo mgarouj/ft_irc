@@ -12,6 +12,7 @@ class Channel {
         std::string password;
         std::vector<Client*> members;
         std::vector<Client*> operators;
+        std::vector<Client*> guests;
         std::vector<std::string> bannedUsers;
         bool inviteOnly;
         bool topicRestricted;
@@ -35,6 +36,10 @@ class Channel {
         void addMember(Client* client);
         void removeMember(Client* client);
         void addOperator(Client* client);
+
+        bool isInvited(Client* client) const;
+        void addInvited(Client* client);
+        void removeInvited(Client* client);
         
         bool isMember(Client* client) const;
         bool isOperator(Client* client) const;

@@ -3,13 +3,15 @@
 void Server::handleKick(int clientFd, std::vector<std::string>& cmds)
 {
 
-    if (cmds.size() < 4)
+    if (cmds.size() < 3)
         sendError(clientFd, 461, "KICK");
     else 
     {
         std::string channel = cmds[1];
         std::string nick = cmds[2];
-        std::string reason = cmds[3];
+        std::string reason;
+        if (cmds.size() > 3)
+            reason = cmds[3];
         if (CheckExist(clientFd, channel))
         {
             std::map<std::string, Channel>::iterator it = channels.find(channel);
@@ -25,10 +27,9 @@ void Server::handleKick(int clientFd, std::vector<std::string>& cmds)
                 sendMsg(clientFd, 441, nick + " " + channel + " :They aren't on that channel");
             else
             {
-                if (it1->second.getInviteFlage() == 1)
-                    it1->second.setInviteFlage(0);
                 it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r", &clients[clientFd]);
                 it->second.removeMember(&(it1->second));
+                it->second.removeInvited(&(it1->second));
                 if(it->second.isEmpty())
                 {
                     std::map<std::string, Channel>::iterator it2 = channels.find(it->first);

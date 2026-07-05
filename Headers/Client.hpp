@@ -72,9 +72,6 @@ class Client
         void setNickAuthentication(bool status);
         void setUserAuthentication(bool status);
 
-        void setInviteFlage(int f);
-        int  getInviteFlage() const;
-
         const std::string &getHostname() const;
         void setHostname(const std::string &host);
         
