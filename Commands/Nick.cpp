@@ -52,9 +52,34 @@ void Server::handleNick(int clientFd, std::vector<std::string>& cmds)
     std::string oldNick = clients[clientFd].getNickname();
     clients[clientFd].setNickname(newNick);
     clients[clientFd].setNickAuthentication(true);
+    clients[clientFd].authenticate();
     if (clients[clientFd].isAuthenticated() && !oldNick.empty())
     {
         std::string notify = ":" + oldNick + " NICK :" + newNick + "\r\n";
         broadcast(notify);
+    }
+    else if (clients[clientFd].isAuthenticated() && oldNick.empty())
+    {
+        std::string nick = clients[clientFd].getNickname();
+        std::string user = clients[clientFd].getUsername();
+        std::string host = clients[clientFd].getHost();
+        std::ostringstream oss;
+
+        oss << ":" << this->serverName << " 001 " << nick 
+            << " :Welcome to the Internet Relay Network " << nick << "!" << user << "@" << host << "\r\n";
+            
+        oss << ":" << this->serverName << " 002 " << nick 
+            << " :Your host is " << this->serverName << ", running version 1.0\r\n";
+            
+        oss << ":" << this->serverName << " 003 " << nick 
+            << " :This server was created today\r\n";
+            
+        oss << ":" << this->serverName << " 004 " << nick 
+            << " " << this->serverName << " 1.0 o o\r\n";
+
+        std::string welcomeMsgs = oss.str();
+        send(clientFd, welcomeMsgs.c_str(), welcomeMsgs.length(), 0);
+        
+        std::cout << "User " << nick << " successfully registered!" << std::endl;
     }
 }
