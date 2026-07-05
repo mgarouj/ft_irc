@@ -72,7 +72,7 @@ void Server::handleInvite(int clientFd, std::vector<std::string>& cmds)
         if (CheckExist(clientFd, channel) && CheckNew(New, channel, clientFd))
         {
             std::map<int, Client>::iterator it = clients.begin();
-            std::map<std::string, Channel>::iterator it1 = channels.find(channel);
+            // std::map<std::string, Channel>::iterator it1 = channels.find(channel);
             for (it = clients.begin(); it != clients.end(); ++it)
             {
                 if (it->second.getNickname() == New)
@@ -80,7 +80,6 @@ void Server::handleInvite(int clientFd, std::vector<std::string>& cmds)
             }
             it->second.setInviteFlage(1);
             sendMsg(it->first,001,":" + clients[clientFd].getNickname() + " INVITE " + it->second.getNickname() + " :" + channel);
-            it1->second.sendNamesList(it->first, it->second.getNickname());
             sendMsg(clientFd, 341, " " +  New + " " + channel);
         }
     }

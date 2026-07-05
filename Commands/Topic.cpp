@@ -15,7 +15,7 @@ bool Server::validTopic(std::string &channel, int clientFd)
         {
             if (!it->second.isMember(&(it1->second)))
             {
-                sendError(clientFd, 403, channel);
+                sendError(clientFd, 442, channel);
                 return false;
             }
         }
