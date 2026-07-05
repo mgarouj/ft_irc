@@ -34,26 +34,32 @@ void Bot::botAuthenticate(std::string &authenticate) {
         throw std::runtime_error("Error: Failed to send authentication.");
     }
     std::string full_response = "";
-    char buffer[1024];
-        memset(buffer, 0, sizeof(buffer)); 
-        int bytes = recv(botsocket, buffer, sizeof(buffer) - 1, 0);
+    for (int i  = 0; i < 3; ++i) {
+        char bffer[1024];
+        memset(bffer,  0, sizeof(bffer)); 
+        int bytes = recv(botsocket, bffer, sizeof(bffer) - 1, 0);
+        std::string buffer(bffer);
         if (bytes <= 0) {
             throw std::runtime_error("Error: Server disconnected during authentication.");
         }
-        full_response = buffer;
-        
-        if (full_response.find(" 001 ") != std::string::npos) {
-            std::cout << "\n✅ Bot successfully authenticated!" << std::endl;
+        if (buffer.find(" 001 ") != std::string::npos || buffer.find(" 464 ") != std::string::npos || buffer.find(" 433 ") != std::string::npos || buffer.find(" 461 ") != std::string::npos) {
+            full_response += buffer;
+            break;
         }
+    }
+    
+    if (full_response.find(" 001 ") != std::string::npos) {
+        std::cout << "\n✅ Bot successfully authenticated!" << std::endl;
+    }
 
-        if (full_response.find(" 464 ") != std::string::npos) 
-            throw std::runtime_error("Error: Authentication Failed - Incorrect Password.");
-        
-        if (full_response.find(" 433 ") != std::string::npos) 
-            throw std::runtime_error("Error: Authentication Failed - Nickname '" + _nickBot + "' is already in use.");
-        
-        if (full_response.find(" 461 ") != std::string::npos) 
-            throw std::runtime_error("Error: Authentication Failed - Not enough parameters.");
+    if (full_response.find(" 464 ") != std::string::npos) 
+        throw std::runtime_error("Error: Authentication Failed - Incorrect Password.");
+    
+    if (full_response.find(" 433 ") != std::string::npos) 
+        throw std::runtime_error("Error: Authentication Failed - Nickname '" + _nickBot + "' is already in use.");
+    
+    if (full_response.find(" 461 ") != std::string::npos) 
+        throw std::runtime_error("Error: Authentication Failed - Not enough parameters.");
 }
 
 void Bot::init()
