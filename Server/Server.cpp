@@ -145,25 +145,26 @@ void Server::handleClient(int clientFd)
         else
             std::cerr << "Error: recv() failed on client " << clientFd << std::endl;
         std::string Message = ":" + clients[clientFd].getNickname() + "!" + clients[clientFd].getUsername() + "@" + clients[clientFd].getHost() + " QUIT\r\n";
-        for (std::map<std::string, Channel>::iterator ite = channels.begin(); ite != channels.end(); ite++)
+        
+        std::map<std::string, Channel>::iterator ite = channels.begin();
+        while (ite != channels.end())
         {
             Client *client = &clients[clientFd];
             if (ite->second.isMember(client))
             {
+                Message = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PART " + ite->first + "\r\n";
                 ite->second.broadcastMessage(Message, client);
-                ite->second.removeMember(&clients[clientFd]);
-                if(clients[clientFd].getchannels_counter() >= 0)
+                ite->second.removeMember(client);
+                send(clientFd, Message.c_str(), Message.length(), 0);
+                if (client->getchannels_counter() > 0)
                     client->setchannels_counter(client->getchannels_counter() - 1);
-                if(ite->second.isEmpty())
-                {
-                    std::map<std::string, Channel>::iterator it = channels.find(ite->first);
-                    if (it != channels.end()){
-                        channels.erase(it);
-                    }
-                    if(channels.size() == 0)
-                        break;
-                }
+                if (ite->second.isEmpty())
+                    channels.erase(ite++); 
+                else
+                    ++ite;
             }
+            else
+                ++ite;
         }
         
         close(clientFd);
