@@ -28,7 +28,8 @@ void Server::handleKick(int clientFd, std::vector<std::string>& cmds)
             else
             {
                 it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r", &clients[clientFd]);
-                sendMsg(clientFd, 001, ": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r");
+                std::string message = ": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r";
+                send(clientFd, message.c_str(), message.length(), 0);
                 it->second.removeMember(&(it1->second));
                 it->second.removeInvited(&(it1->second));
                 if(it->second.isEmpty())

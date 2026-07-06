@@ -48,12 +48,13 @@ void Server::handleTopic(int clientFd, std::vector<std::string>& cmds)
                 std::string reason = cmds[2];
                 if (it->second.isTopicRestricted() && !(it->second.isOperator(&(it1->second))))
                 {
-                    std::string message = clients[clientFd].getNickname() + " " + channel ;
+                    std::string message = clients[clientFd].getNickname() + " " + channel + " :You're not channel operator";
                     sendError(clientFd, 482, message);
                 }
                 else
                 {
                     it->second.setTopic(reason);
+                    it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " TOPIC " + channel + " :" + it->second.getTopic() + "\n\r", &clients[clientFd]);
                     sendMsg(clientFd, 332, clients[clientFd].getNickname() + " " + channel + " :" + it->second.getTopic());
                 }
             }
