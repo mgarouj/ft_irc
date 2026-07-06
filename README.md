@@ -124,11 +124,11 @@ After connecting, you can use commands such as:
 
 /topic #42 :Welcome to ircserv
 
-/invite Bob #42
+/invite Ali #42
 
-/kick Bob Spamming
+/kick Ali Spamming
 
-/msg Alice Hello!
+/msg smain Hello!
 ```
 
 ---
@@ -150,19 +150,19 @@ Set the topic:
 Invite another user:
 
 ```irc
-/invite Bob #42
+/invite Ali #42
 ```
 
 Kick a user:
 
 ```irc
-/kick Bob :Spamming
+/kick Ali :Spamming
 ```
 
 Send a private message:
 
 ```irc
-/msg Alice Hello!
+/msg smain Hello!
 ```
 
 ---
@@ -174,7 +174,6 @@ Send a private message:
 - Event-driven architecture using `poll()`
 - One server process
 - Non-blocking sockets
-- Object-oriented design
 - Modular command handlers
 - Channel and client management separated into dedicated classes
 
@@ -201,16 +200,12 @@ Send a private message:
 
 ## AI Usage
 
-Artificial Intelligence was used as a learning and documentation assistant throughout the development of this project.
+Artificial Intelligence was used as a learning and debugging assistant throughout the development of this project.
 
 It was primarily used for:
 
-- Understanding the IRC protocol (RFC 1459)
-- Clarifying the behavior of IRC commands
-- Reviewing C++98 concepts
-- Discussing networking concepts and socket programming
-- Explaining protocol edge cases
-- Reviewing code for debugging and design suggestions
+- Understanding and interpreting error messages during compilation and runtime
+- Helping identify the possible causes of bugs based on error messages
 
 All architectural decisions, implementation, testing, debugging, and final source code were completed and validated by the project authors.
 
