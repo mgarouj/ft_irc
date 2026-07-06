@@ -29,10 +29,17 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
         return;
     }
 
-    if (!channel.isOperator(client))
+    if (!channel.isMember(client))
     {
         Message = Target;
         sendError(clientFd, 482, Message);
+        return;
+    }
+
+    if (!channel.isOperator(client))
+    {
+        Message = Target;
+        sendError(clientFd, 442, Message);
         return;
     }
 
@@ -97,6 +104,12 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
                 {
                     if(clientit->second.getNickname() == targetNick)
                     {
+                        if (!channel.isMember(&clientit->second))
+                        {
+                            Message = Target;
+                            sendError(clientFd, 442, Message);
+                            break;
+                        }
                         Client* NextOperator = &clients[clientit->second.getFd()];
                         if(isAdding)
                             channel.addOperator(NextOperator);
@@ -105,7 +118,7 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
                         TargetNickFound = true;
                     }
                 }
-                if(!TargetNickFound)
+                if(!TargetNickFound && !channel.isMember(&clients[clientFd]))
                     continue;
                 successfulModes += "o";
                 successfulArgs += " " + targetNick;
