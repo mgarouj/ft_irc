@@ -3,7 +3,7 @@ BOT_NAME    = irc_bot
 
 CXX         = c++
 
-CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
+CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 
 
 SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Server/ErrorMsg.cpp  ./Commands/Pass.cpp \
@@ -20,7 +20,7 @@ OBJS_B      = $(SRCS_B:.cpp=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS) ./Headers/Server.hpp
+$(NAME): $(OBJS) ./Headers/Server.hpp ./Headers/Client.hpp ./Headers/Channel.hpp
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
 %.o: %.cpp
@@ -39,9 +39,5 @@ fclean: clean
 	rm -f $(NAME) $(BOT_NAME)
 
 re: fclean all
-
-run: fclean all clean
-	clear
-	./ircserv 7777 aaaa
 
 .PHONY: all clean fclean re bonus run

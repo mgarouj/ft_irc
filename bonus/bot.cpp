@@ -128,6 +128,10 @@ void Bot::listenAndRespond() {
                         std::string reply = "PRIVMSG " + senderNick + " :Available commands: !joke, !ping, !help\r\n";
                         send(botsocket, reply.c_str(), reply.length(), 0);
                     }
+                    else {
+                        std::string reply = "PRIVMSG " + senderNick + " :Error: Command not found. Type !help to see available commands.\r\n";
+                        send(botsocket, reply.c_str(), reply.length(), 0);
+        }
                 }
             }
         }

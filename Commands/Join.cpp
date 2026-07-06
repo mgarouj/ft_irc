@@ -79,7 +79,7 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
                 sendError(clientFd, 474, Message);
                 continue;
             }
-            if (channel.isInviteOnly())
+            if (channel.isInviteOnly() && !(channel.isInvited(client)))
             {
                 Message = client->getNickname() + " " + channel.getName();
                 sendError(clientFd, 473, Message);
@@ -91,7 +91,7 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
                 sendError(clientFd, 471, Message);
                 continue;
             }
-            if (channel.HasPass() && channel.getPass() != currentKey)
+            if (channel.HasPass() && channel.getPass() != currentKey && !(channel.isInvited(client)))
             {
                 Message = client->getNickname() + " " + channel.getName();
                 sendError(clientFd, 475, Message);
