@@ -128,7 +128,6 @@ After connecting, you can use commands such as:
 
 /kick Ali Spamming
 
-/msg smain Hello!
 ```
 
 ---
@@ -160,10 +159,6 @@ Kick a user:
 ```
 
 Send a private message:
-
-```irc
-/msg smain Hello!
-```
 
 ---
 
