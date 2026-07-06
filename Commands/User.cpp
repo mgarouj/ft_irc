@@ -53,7 +53,7 @@ void Server::handleUser(int clientFd, std::vector<std::string>& cmds)
             << " :This server was created today\r\n";
             
         oss << ":" << this->serverName << " 004 " << nick 
-            << " " << this->serverName << " 1.0 o o\r\n";
+            << " " << this->serverName << " 1.0 o itkol\r\n";
 
         std::string welcomeMsgs = oss.str();
         send(clientFd, welcomeMsgs.c_str(), welcomeMsgs.length(), 0);
