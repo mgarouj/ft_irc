@@ -8,7 +8,8 @@ void Server::handlePart(int clientFd, std::vector<std::string>& cmds)
         sendError(clientFd, 461, "PART");
         return;
     }
-    for (std::map<std::string, Channel>::iterator ite = channels.begin(); ite != channels.end(); ite++)
+    std::map<std::string, Channel>::iterator ite = channels.begin();
+    while (ite != channels.end())
     {
         if (ite->second.isMember(client))
         {
@@ -16,15 +17,14 @@ void Server::handlePart(int clientFd, std::vector<std::string>& cmds)
             ite->second.broadcastMessage(Message, client);
             ite->second.removeMember(client);
             send(clientFd, Message.c_str(), Message.length(), 0);
-            if(client->getchannels_counter() >= 0)
+            if (client->getchannels_counter() > 0)
                 client->setchannels_counter(client->getchannels_counter() - 1);
-            if(ite->second.isEmpty())
-            {
-                std::map<std::string, Channel>::iterator it = channels.find(ite->first);
-                if (it != channels.end())
-                    channels.erase(it);
-                break;
-            }
+            if (ite->second.isEmpty())
+                channels.erase(ite++); 
+            else
+                ++ite;
         }
+        else
+            ++ite;
     }
 }
