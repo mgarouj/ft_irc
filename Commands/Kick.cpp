@@ -22,12 +22,13 @@ void Server::handleKick(int clientFd, std::vector<std::string>& cmds)
                     break;
             }
             if (it1 == clients.end())
-                sendError(clientFd, 401, nick);
+                sendError(clientFd, 401);
             else if (!(it->second.isMember(&(it1->second))))
                 sendMsg(clientFd, 441, nick + " " + channel + " :They aren't on that channel");
             else
             {
                 it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r", &clients[clientFd]);
+                sendMsg(clientFd, 001, ": " + clients[clientFd].getNickname() + " KICK " + channel + " " + nick + " :" + reason + "\n\r");
                 it->second.removeMember(&(it1->second));
                 it->second.removeInvited(&(it1->second));
                 if(it->second.isEmpty())

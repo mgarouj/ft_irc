@@ -30,14 +30,14 @@ void Server::handleNick(int clientFd, std::vector<std::string>& cmds)
     std::string specialChars = "-[]\\`^{}_"; 
     if (!std::isalpha(newNick[0]) && specialChars.find(newNick[0]) == std::string::npos)
     {
-        sendError(clientFd, 432, newNick);
+        sendError(clientFd, 432);
         return;
     }
     for (size_t i = 1; i < newNick.length(); ++i)
     {
         if (!std::isalnum(newNick[i]) && specialChars.find(newNick[i]) == std::string::npos)
         {
-            sendError(clientFd, 432, newNick);
+            sendError(clientFd, 432);
             return;
         }
     }
@@ -45,7 +45,7 @@ void Server::handleNick(int clientFd, std::vector<std::string>& cmds)
     {
         if (i->second.getNickname() == newNick && i->first != clientFd)
         {
-            sendError(clientFd, 433, newNick);
+            sendError(clientFd, 433);
             return;
         }
     }
@@ -75,7 +75,7 @@ void Server::handleNick(int clientFd, std::vector<std::string>& cmds)
             << " :This server was created today\r\n";
             
         oss << ":" << this->serverName << " 004 " << nick 
-            << " " << this->serverName << " 1.0 o o\r\n";
+            << " " << this->serverName << " 1.0 o itkol\r\n";
 
         std::string welcomeMsgs = oss.str();
         send(clientFd, welcomeMsgs.c_str(), welcomeMsgs.length(), 0);

@@ -56,7 +56,7 @@ void Server::handlePrivmsg(int clientFd, std::vector<std::string>& cmds)
             bool userFound = false;
             for(std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); it++)
             {
-                if(it->second.getNickname() == Target && it->second.getUserAuthentication())
+                if(it->second.getNickname() == Target && it->second.isAuthenticated())
                 {
                     userFound = true;
                     Message =  ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PRIVMSG " + it->second.getNickname() + ":" + cmds[2] + "\r\n";

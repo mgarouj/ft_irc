@@ -55,14 +55,14 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
 
         if (currentChan.empty() || currentChan.size() == 1 || (currentChan[0] != '#' && currentChan[0] != '&'))
         {
-            Message = client->getNickname() + " " + currentChan;
+            Message = currentChan;
             sendError(clientFd, 403, Message);
             continue; 
         }
 
         if (client->getchannels_counter() >= 30)
         {
-            Message = client->getNickname() + " " + currentChan;
+            Message = currentChan;
             sendError(clientFd, 405, Message);
             continue; 
         }
@@ -73,32 +73,26 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
         if (ite != channels.end())
         {
             Channel& channel = ite->second;
-            if (channel.isBanned(client))
-            {
-                Message = client->getNickname() + " " + channel.getName();
-                sendError(clientFd, 474, Message);
-                continue;
-            }
             if (channel.isInviteOnly() && !(channel.isInvited(client)))
             {
-                Message = client->getNickname() + " " + channel.getName();
+                Message = channel.getName();
                 sendError(clientFd, 473, Message);
                 continue;
             }
             if (channel.isChannelFull())
             {
-                Message = client->getNickname() + " " + channel.getName();
+                Message = channel.getName();
                 sendError(clientFd, 471, Message);
                 continue;
             }
             if (channel.HasPass() && channel.getPass() != currentKey && !(channel.isInvited(client)))
             {
-                Message = client->getNickname() + " " + channel.getName();
+                Message = channel.getName();
                 sendError(clientFd, 475, Message);
                 continue;
             }
             if(channel.isMember(client))
-                return;
+                continue;
             channel.addMember(client);
             Message = clientPrefix + " JOIN :" + channel.getName() + "\r\n";
             channel.broadcastMessage(Message, NULL);
@@ -106,7 +100,7 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
 
             if (channel.isTopicRestricted())
             {
-                Message = ": " + serverName + " 332 " + client->getNickname() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n";
+                Message = ": " + serverName + " 332 " + client->getNickname() + " " + channel.getName() + " :" + (channel.getTopic().empty() ? "No topic is set" : channel.getTopic()) + "\r\n";
                 send(clientFd, Message.c_str(), Message.length(), 0);
             }
             channel.sendNamesList(clientFd, client->getNickname());

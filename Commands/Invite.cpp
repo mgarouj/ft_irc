@@ -13,7 +13,7 @@ bool Server::CheckExist(int clientFd, std::string &channel)
     std::map<std::string, Channel>::iterator it = channels.find(channel);
     if (it == channels.end())
     {
-        sendError(clientFd, 403);
+        sendError(clientFd, 403, channel);
         return false;
     }
     else
@@ -47,7 +47,7 @@ bool Server::CheckNew(std::string &nick, std::string &channel, int clientFd)
     }
     if (it == clients.end())
     {
-        sendError(clientFd, 401, nick);
+        sendError(clientFd, 401);
         return false;
     }
     else

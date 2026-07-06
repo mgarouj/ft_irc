@@ -15,7 +15,7 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
     std::string Target = cmds[1];
     if (channels.find(Target) == channels.end())
     {
-        Message = client->getNickname() + " " + Target;
+        Message = Target;
         sendError(clientFd, 401, Message);
         return;
     }
@@ -24,14 +24,14 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
 
     if (cmds.size() == 2)
     {
-        Message = ":localhost 324 " + client->getNickname() + " " + Target +" (+ | -)<i,t,k,l,o>\r\n";
+        Message = ":ircserv.com 324 " + client->getNickname() + " " + Target +" (+ | -)<i,t,k,l,o>\r\n";
         send(clientFd, Message.c_str(), Message.length(), 0);
         return;
     }
 
     if (!channel.isOperator(client))
     {
-        Message = client->getNickname() + " " + Target;
+        Message = Target;
         sendError(clientFd, 482, Message);
         return;
     }

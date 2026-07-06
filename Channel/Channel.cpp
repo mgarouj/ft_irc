@@ -106,11 +106,6 @@ bool Channel::isOperator(Client* client) const
     return std::find(operators.begin(), operators.end(), client) != operators.end();
 }
 
-bool Channel::isBanned(Client* client) const
-{
-    return std::find(bannedUsers.begin(), bannedUsers.end(), client->getNickname()) != bannedUsers.end();
-}
-
 bool Channel::isInviteOnly() const 
 {
     return inviteOnly;
@@ -133,7 +128,7 @@ bool Channel::isEmpty() const
 
 void Channel::sendNamesList(int clientFd, const std::string& clientNick)
 {
-    std::string prefix = ":localhost 353 " + clientNick + " = " + this->name + " :";
+    std::string prefix = ":ircserv.com 353 " + clientNick + " = " + this->name + " :";
     std::string currentLine = prefix;
 
     for (size_t i = 0; i < members.size(); ++i)
@@ -159,7 +154,7 @@ void Channel::sendNamesList(int clientFd, const std::string& clientNick)
         currentLine += "\r\n";
         send(clientFd, currentLine.c_str(), currentLine.length(), 0);
     }
-    std::string endMsg = ":localhost 366 " + clientNick + " " + this->name + " :End of /NAMES list\r\n";
+    std::string endMsg = ":ircserv.com 366 " + clientNick + " " + this->name + " :End of /NAMES list\r\n";
     send(clientFd, endMsg.c_str(), endMsg.length(), 0);
 }
 

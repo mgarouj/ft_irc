@@ -13,7 +13,6 @@ class Channel {
         std::vector<Client*> members;
         std::vector<Client*> operators;
         std::vector<Client*> guests;
-        std::vector<std::string> bannedUsers;
         bool inviteOnly;
         bool topicRestricted;
         size_t userLimit;
@@ -43,7 +42,6 @@ class Channel {
         
         bool isMember(Client* client) const;
         bool isOperator(Client* client) const;
-        bool isBanned(Client* client) const;
         bool isInviteOnly() const;
         bool isChannelFull() const;
         bool isTopicRestricted() const;
