@@ -96,6 +96,26 @@ void Server::run()
             else if (pollfds[i].revents & (POLLHUP | POLLERR))
             {
                 std::cout << "Client disconnected: " << pollfds[i].fd << std::endl;
+                std::string Message = ":" + clients[pollfds[i].fd].getNickname() + "!" + clients[pollfds[i].fd].getUsername() + "@" + clients[pollfds[i].fd].getHost() + " QUIT :Client exited\r\n";
+        
+                std::map<std::string, Channel>::iterator ite = channels.begin();
+                while (ite != channels.end())
+                {
+                    Client *client = &clients[pollfds[i].fd];
+                    if (ite->second.isMember(client))
+                    {
+                        ite->second.broadcastMessage(Message, client);
+                        ite->second.removeMember(client);
+                        if (client->getchannels_counter() > 0)
+                            client->setchannels_counter(client->getchannels_counter() - 1);
+                        if (ite->second.isEmpty())
+                            channels.erase(ite++); 
+                        else
+                            ++ite;
+                    }
+                    else
+                        ++ite;
+                }
                 close(pollfds[i].fd);
                 pollfds.erase(pollfds.begin() + i);
                 clients.erase(pollfds[i].fd);
@@ -128,7 +148,7 @@ void Server::acceptConnection()
     pollfds.push_back(clientPfd);
     clients[clientFd] = Client(clientFd);
     clients[clientFd].setHost(inet_ntoa(clientAddress.sin_addr));
-    std::cout << "New client connected: [" << clientFd << "]" <<std::endl;
+    std::cout << "New client connected: " << clientFd << " from " << clients[clientFd].getHost() << std::endl;
 }
 
 
@@ -144,7 +164,7 @@ void Server::handleClient(int clientFd)
             std::cout << "Client " << clientFd << " disconnected." << std::endl;
         else
             std::cerr << "Error: recv() failed on client " << clientFd << std::endl;
-        std::string Message = ":" + clients[clientFd].getNickname() + "!" + clients[clientFd].getUsername() + "@" + clients[clientFd].getHost() + " QUIT\r\n";
+        std::string Message = ":" + clients[clientFd].getNickname() + "!" + clients[clientFd].getUsername() + "@" + clients[clientFd].getHost() + " QUIT :Client exited\r\n";
         
         std::map<std::string, Channel>::iterator ite = channels.begin();
         while (ite != channels.end())
@@ -152,10 +172,8 @@ void Server::handleClient(int clientFd)
             Client *client = &clients[clientFd];
             if (ite->second.isMember(client))
             {
-                Message = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PART " + ite->first + "\r\n";
                 ite->second.broadcastMessage(Message, client);
                 ite->second.removeMember(client);
-                send(clientFd, Message.c_str(), Message.length(), 0);
                 if (client->getchannels_counter() > 0)
                     client->setchannels_counter(client->getchannels_counter() - 1);
                 if (ite->second.isEmpty())

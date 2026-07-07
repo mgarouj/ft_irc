@@ -79,7 +79,8 @@ void Server::handleInvite(int clientFd, std::vector<std::string>& cmds)
                     break;
             }
             it1->second.addInvited(&(it->second));
-            sendMsg(it->first,001,":" + clients[clientFd].getNickname() + " INVITE " + it->second.getNickname() + " :" + channel);////
+            std::string message = ":" + clients[clientFd].getNickname() + " INVITE " + it->second.getNickname() + " :" + channel + "\r\n";
+            send(it->first, message.c_str(), message.length(), 0);
             sendMsg(clientFd, 341, " " +  New + " " + channel);
         }
     }

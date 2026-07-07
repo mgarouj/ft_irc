@@ -27,17 +27,17 @@ void Server::handleNick(int clientFd, std::vector<std::string>& cmds)
 
     if (newNick.length() > 9) 
         newNick = newNick.substr(0, 9);
-    std::string specialChars = "-[]\\`^{}_"; 
-    if (!std::isalpha(newNick[0]) && specialChars.find(newNick[0]) == std::string::npos)
+    if (!std::isalpha(static_cast<unsigned char>(newNick[0])))
     {
-        sendError(clientFd, 432);
+        sendError(clientFd, 432, newNick);
         return;
     }
+    std::string specialChars = "-[]\\`^{}_";
     for (size_t i = 1; i < newNick.length(); ++i)
     {
-        if (!std::isalnum(newNick[i]) && specialChars.find(newNick[i]) == std::string::npos)
+        if (!std::isalnum(static_cast<unsigned char>(newNick[i])) && specialChars.find(newNick[i]) == std::string::npos)
         {
-            sendError(clientFd, 432);
+            sendError(clientFd, 432, newNick);
             return;
         }
     }
@@ -83,3 +83,4 @@ void Server::handleNick(int clientFd, std::vector<std::string>& cmds)
         std::cout << "User " << nick << " successfully registered!" << std::endl;
     }
 }
+

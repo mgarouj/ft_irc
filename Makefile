@@ -10,7 +10,6 @@ SRCS        = main.cpp ./Client/Client.cpp ./Server/Server.cpp ./Server/ErrorMsg
               ./Commands/Nick.cpp ./Commands/User.cpp ./Channel/Channel.cpp \
               ./Commands/Join.cpp ./Commands/Privmsg.cpp ./Commands/Mode.cpp \
 				./Commands/Invite.cpp ./Commands/Kick.cpp ./Commands/Topic.cpp \
-				./Commands/Part.cpp
 
 OBJS        = $(SRCS:.cpp=.o)
 
