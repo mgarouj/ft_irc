@@ -54,7 +54,7 @@ void Server::handleTopic(int clientFd, std::vector<std::string>& cmds)
                 else
                 {
                     it->second.setTopic(reason);
-                    it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " TOPIC " + channel + " :" + it->second.getTopic() + "\n\r", &clients[clientFd]);
+                    it->second.broadcastMessage(": " + clients[clientFd].getNickname() + " TOPIC " + channel + " :" + it->second.getTopic() + "\r\n", &clients[clientFd]);
                     sendMsg(clientFd, 332, clients[clientFd].getNickname() + " " + channel + " :" + it->second.getTopic());
                 }
             }

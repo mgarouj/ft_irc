@@ -229,13 +229,12 @@ std::vector<std::string> Server::extractAndSplit(std::string &buffer)
     return args;
 }
 
-
 void Server::executeCommand(std::vector<std::string>& cmds, int clientFd)
 {
     if (cmds.empty() || cmds[0].empty())
         return;
 
-    std::string command = cmds[0].substr(0, cmds[0].size());
+    std::string command(cmds[0]);
     for (size_t i = 0; i < command.length(); ++i)
     {
         command[i] = std::toupper(command[i]);
