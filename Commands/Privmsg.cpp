@@ -39,7 +39,7 @@ void Server::handlePrivmsg(int clientFd, std::vector<std::string>& cmds)
                 }
                 else
                 {
-                    Message = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PRIVMSG " + channel->second.getName() + ":" + cmds[2] + "\r\n";
+                    Message = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PRIVMSG " + channel->second.getName() + " :" + cmds[2] + "\r\n";
                     channel->second.broadcastMessage(Message, client);
                     continue;
                 }
@@ -59,7 +59,7 @@ void Server::handlePrivmsg(int clientFd, std::vector<std::string>& cmds)
                 if(it->second.getNickname() == Target && it->second.isAuthenticated())
                 {
                     userFound = true;
-                    Message =  ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PRIVMSG " + it->second.getNickname() + ":" + cmds[2] + "\r\n";
+                    Message =  ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHost() + " PRIVMSG " + it->second.getNickname() + " :" + cmds[2] + "\r\n";
                     send(it->first, Message.c_str(), Message.length(), 0);
                     break;
                 }   
