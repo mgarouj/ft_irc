@@ -22,6 +22,10 @@ const std::string& Channel::getPass() const
     return password; 
 }
 
+const size_t& Channel::getUserLimit() const
+{
+    return userLimit;
+}
 
 bool Channel::HasPass() const 
 { 

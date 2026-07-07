@@ -6,7 +6,6 @@ void Server::CloseFds()
 {
     for (size_t i = 0; i < pollfds.size(); i++)
     {
-        std::cout << "Closing file descriptor: " << pollfds[i].fd << std::endl;
         close(pollfds[i].fd);
     }
 }

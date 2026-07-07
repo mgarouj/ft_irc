@@ -8,15 +8,23 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
 
     if (cmds.size() < 2)
     {
-        sendError(clientFd, 411, client->getNickname());
+        sendError(clientFd, 461, client->getNickname());
         return;
     }
 
     std::string Target = cmds[1];
+
+    if (Target.empty() || (Target[0] != '#' && Target[0] != '&'))
+    {
+        Message = Target;
+        sendError(clientFd, 403, Message);
+        return; 
+    }
+
     if (channels.find(Target) == channels.end())
     {
         Message = Target;
-        sendError(clientFd, 401, Message);
+        sendError(clientFd, 403, Message);
         return;
     }
 
@@ -24,7 +32,31 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
 
     if (cmds.size() == 2)
     {
-        Message = ":ircserv.com 324 " + client->getNickname() + " " + Target +" (+ | -)<i,t,k,l,o>\r\n";
+        std::string activeModes = "+";
+        std::string modeArgs = "";
+
+        if (channel.isInviteOnly()) {
+            activeModes += "i";
+        }
+        if (channel.isTopicRestricted()) {
+            activeModes += "t";
+        }
+        if (!channel.getPass().empty()) {
+            activeModes += "k";
+            modeArgs += " " + channel.getPass();
+        }
+        if (channel.getUserLimit() > 0) {
+            activeModes += "l";
+            std::stringstream ss;
+            ss << channel.getUserLimit();
+            modeArgs += " " + ss.str(); 
+        }
+        
+        if (activeModes == "+") {
+            activeModes = ""; 
+        }
+
+        Message = ":ircserv.com 324 " + client->getNickname() + " " + Target + " " + activeModes + modeArgs + "\r\n";                      
         send(clientFd, Message.c_str(), Message.length(), 0);
         return;
     }
@@ -32,14 +64,14 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
     if (!channel.isMember(client))
     {
         Message = Target;
-        sendError(clientFd, 482, Message);
+        sendError(clientFd, 442, Message);
         return;
     }
 
     if (!channel.isOperator(client))
     {
         Message = Target;
-        sendError(clientFd, 442, Message);
+        sendError(clientFd, 482, Message);
         return;
     }
 
@@ -99,29 +131,33 @@ void Server::handleMode(int clientFd, std::vector<std::string>& cmds)
             if (argIdx < cmds.size())
             {
                 std::string targetNick = cmds[argIdx];
-                bool TargetNickFound = false;
+                Client* targetClient = NULL; 
                 for(std::map<int, Client>::iterator clientit = clients.begin(); clientit != clients.end(); clientit++)
                 {
                     if(clientit->second.getNickname() == targetNick)
                     {
-                        if (!channel.isMember(&clientit->second))
-                        {
-                            Message = Target;
-                            sendError(clientFd, 442, Message);
-                            break;
-                        }
-                        Client* NextOperator = &clients[clientit->second.getFd()];
-                        if(isAdding)
-                            channel.addOperator(NextOperator);
-                        else
-                            channel.removeOperator(NextOperator);
-                        TargetNickFound = true;
+                        targetClient = &clientit->second;
+                        break;
                     }
                 }
-                if(!TargetNickFound && !channel.isMember(&clients[clientFd]))
-                    continue;
-                successfulModes += "o";
-                successfulArgs += " " + targetNick;
+                if (!targetClient)
+                {
+                    sendError(clientFd, 401, targetNick);
+                }
+                else if (!channel.isMember(targetClient))
+                {
+                    sendError(clientFd, 441, targetNick + " " + Target);
+                }
+                else
+                {
+                    if(isAdding)
+                        channel.addOperator(targetClient);
+                    else
+                        channel.removeOperator(targetClient);
+                        
+                    successfulModes += "o";
+                    successfulArgs += " " + targetNick;
+                }
                 argIdx++;
             }
         }

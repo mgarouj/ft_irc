@@ -74,6 +74,8 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
         if (ite != channels.end())
         {
             Channel& channel = ite->second;
+            if(channel.isMember(client))
+                continue;
             if (channel.isInviteOnly() && !(channel.isInvited(client)))
             {
                 Message = channel.getName();
@@ -92,8 +94,6 @@ void Server::handleJoin(int clientFd, std::vector<std::string>& cmds)
                 sendError(clientFd, 475, Message);
                 continue;
             }
-            if(channel.isMember(client))
-                continue;
             channel.addMember(client);
             Message = clientPrefix + " JOIN :" + channel.getName() + "\r\n";
             channel.broadcastMessage(Message, NULL);

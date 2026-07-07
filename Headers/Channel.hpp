@@ -25,6 +25,7 @@ class Channel {
         const std::string& getName() const;
         const std::string& getTopic() const;
         const std::string& getPass() const;
+        const size_t& getUserLimit() const;
         bool HasPass() const;
         void setPassword(const std::string& newPassword);
         void setTopic(const std::string& newTopic);
