@@ -9,9 +9,10 @@ std::string Server::getErrorMsg(int errCode, const std::string& detail)
         case 401: return detail + " :No such nick/channel";
         case 403: return detail + " :No such channel";
         case 404: return detail + " :Cannot send to channel";
+        case 405: return detail + " :You have joined too many";
         case 411: return ":No recipient given (" + detail + ")";
         case 412: return ":No text to send";
-        case 421: return detail + ":Unknown command";
+        case 421: return detail + " :Unknown command";
         case 431: return ":No nickname given";
         case 432: return detail + " :Erroneus nickname";
         case 433: return detail + " :Nickname is already in use";
@@ -28,7 +29,7 @@ std::string Server::getErrorMsg(int errCode, const std::string& detail)
         case 482: return detail + " :You're not channel operator";
         
         
-        default:  return ":Unknown error";
+        default:  return " :Unknown error";
     }
 }
 

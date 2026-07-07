@@ -103,7 +103,7 @@ void Server::run()
                     Client *client = &clients[pollfds[i].fd];
                     if (ite->second.isMember(client))
                     {
-                        ite->second.broadcastMessage(Message, client);
+                        ite->second.broadcastMessage(Message, NULL);
                         ite->second.removeMember(client);
                         if (client->getchannels_counter() > 0)
                             client->setchannels_counter(client->getchannels_counter() - 1);
@@ -171,7 +171,7 @@ void Server::handleClient(int clientFd)
             Client *client = &clients[clientFd];
             if (ite->second.isMember(client))
             {
-                ite->second.broadcastMessage(Message, client);
+                ite->second.broadcastMessage(Message, NULL);
                 ite->second.removeMember(client);
                 if (client->getchannels_counter() > 0)
                     client->setchannels_counter(client->getchannels_counter() - 1);

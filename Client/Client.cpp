@@ -5,12 +5,12 @@
 // Default Constructor
 Client::Client() : fd(-1), nickname(""), username(""), realname(""), password(""), 
                    authenticated(false), passAuthentication(false), 
-                   nickAuthentication(false), userAuthentication(false) {}
+                   nickAuthentication(false), userAuthentication(false), channels_counter(0) {}
 
 // Parameterized Constructor
 Client::Client(int fd) : fd(fd), nickname(""), username(""), realname(""), password(""), 
                          authenticated(false), passAuthentication(false), 
-                         nickAuthentication(false), userAuthentication(false) {}
+                         nickAuthentication(false), userAuthentication(false), channels_counter(0) {}
 
 // Copy Constructor
 Client::Client(const Client &other) : fd(other.fd), nickname(other.nickname), 

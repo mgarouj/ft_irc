@@ -4,7 +4,7 @@ void sendMsg(int fd, int code, const std::string& msg)
 {
     std::stringstream ss;
 
-    ss << "ircserv " << code << " " << msg << "\r\n";
+    ss << "ircserv.com " << code << " " << msg << "\r\n";
     send(fd, ss.str().c_str(), ss.str().size(), 0);
 }
 
